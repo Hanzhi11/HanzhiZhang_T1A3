@@ -1,7 +1,5 @@
 from datetime import date, timedelta, datetime
 
-import re
-
 list_collection = {}
 items = []
 
@@ -14,10 +12,6 @@ class ItemContent:
 
     def __repr__(self):
         return f'Item name: {self.name}, Priority: {self.priority}, Due on: {self.due_date}'
-
-class DateError(Exception):
-    def __init__(self):
-        super().__init__('Invalid date!')
 class PriorityError(Exception):
     def __init__(self):
         super().__init__('Wrong priority level!')
@@ -55,50 +49,49 @@ def add_item(list_name, item):
     item_due_date = item_content[2]
     convert_due_date = datetime.strptime(item_content[2], '%d/%m/%y').date()
     default_due_date= date.today() + timedelta(days = 1)
+
     if len(item_priority_level) == 0 and len(item_content[2]) != 0:
         item_content_details = ItemContent(item_name, 'medium', convert_due_date)
     elif len(item_priority_level) == 0 and len(item_content[2]) == 0:
         item_content_details = ItemContent(item_name, 'medium', default_due_date)
     else:
         item_content_details = ItemContent(item_name, item_priority_level, item_due_date)
+
     items.append(item_content_details)
     items_list = dict(enumerate(items))
     print (item_content_details)
     new_list = {list_name: items_list}
     print(new_list)
-    return 'added'
 
 
 def input_check(item):
     item_content = item.split(',')
-    try:
-        if item.count(',') == 2 and len(item_content[0]) != 0:
-            if len(item_content[1]) != 0 and item_content[1] not in ['high', 'medium', 'low']:
-                raise PriorityError
-            elif len(item_content[2]) != 0 and not re.match('^[0-9]{2}/[0-9]{2}/[0-9]{2}', item_content[2]):
-                raise DateError
-            else:
-                return item
+    if item.count(',') == 2 and len(item_content[0]) != 0:
+        if len(item_content[1]) != 0 and item_content[1] not in ['high', 'medium', 'low']:
+            raise PriorityError
         else:
-            raise InvalidInputError
-    except PriorityError:
-        return 'invalid priortity level'
-    except DateError:
-        return 'invalid date'
-    except InvalidInputError:
-        return 'invalid input'
+            return item
+    else:
+        raise InvalidInputError
 
-        # try:
-        #     if len(item_content[2]) == 0:
-        #         return item
-        #     else:
-        #         datetime.strptime(item_content[2], '%d/%m/%y').date()
-        #         return item
-        # except DateError('Invalid date!'):
-        #     return 'invalid date'
-    # else:
-    #     print('Invalid input!')
-    #     return 'invalid input (element missing)'
+def test_check_and_add(list_name):
+    input_is_valid = False
+    while not input_is_valid:
+        item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or Q to back): ')
+        check_result = quit_check_main(item)
+        if check_result == 'back to main':
+            break
+        else:
+            try:
+                input_check(item)
+                add_item(list_name, item)
+                input_is_valid = True
+            except PriorityError as err:
+                print(err)
+            except InvalidInputError as err:
+                print(err)
+            except ValueError:
+                print('Invalid date!')
 
 try:
     what_to_do = 0
@@ -111,41 +104,16 @@ try:
             check_result = quit_check_main(list_name)
             print(check_result)
             if check_result == list_name:
-                input_is_valid = False    
-                while not input_is_valid:
-                    item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or Q to back): ')
-                    check_result = quit_check_main(item)
+                test_check_and_add(list_name)
+                while check_result not in ['back to main', 'back to sub']:
+                    check_if_add_more = input('Add more? (X to exit the app, Q to quit, Y for Yes) ')
+                    check_result = quit_check_main(check_if_add_more)
                     if check_result == 'back to main':
                         break
+                    elif check_result == 'Y':
+                        test_check_and_add(list_name)
                     else:
-                        if input_check(item) not in ['invalid input', 'invalid date', 'invalid priority level']:
-                            add_item(list_name, item)
-                            input_is_valid = True
-                        else:
-                            continue
-                else:
-                    while check_result not in ['back to main', 'back to sub']:
-                        check_if_add_more = input('Add more? (X to exit the app, Q to quit, Y for Yes) ')
-                        check_result = quit_check_main(check_if_add_more)
-                        if check_result == 'back to sub':
-                            break
-                        elif check_result == 'back to main':
-                            break
-                        elif check_result == 'Y':
-                            input_is_valid = False
-                            while not input_is_valid:
-                                item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or Q to back): ')
-                                check_result = quit_check_main(item)
-                                if check_result == 'back to main':
-                                    break
-                                else:
-                                    if input_check(item) not in ['invalid input', 'invalid date', 'invalid priority level']:
-                                        add_item(list_name, item)
-                                        input_is_valid = True
-                                    else:
-                                        continue
-                        else:
-                            print('Invalid input!')
+                        print('Invalid input!')
         elif check_result == 'edit':
             print('to edit')
         elif check_result == 'delete':
@@ -154,14 +122,6 @@ try:
             print('to view')
         else:
             print('Invalid input!')
-
-
-            
-
-
-
-
-
 
 
 
