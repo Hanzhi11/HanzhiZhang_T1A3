@@ -19,19 +19,21 @@ class PriorityError(Exception):
 class InvalidInputError(Exception):
     def __init__(self):
         super().__init__('Invalid input (element missing)')
+
+class BackToMain(Exception):
+    def __init__(self):
+        super().__init__('Back to main options!')
         
 
 def quit_app(input):
     if input == 'X':
-        print('exit')
         raise KeyboardInterrupt
     else:
         return input
 
 def quit_check_main(input):
     if input == 'Q':
-        print ('Back to the main options')
-        return 'back to main'
+        raise BackToMain
     else:
         return quit_app(input)
 
@@ -64,7 +66,7 @@ def add_item(list_name, item):
     print(new_list)
 
 
-def input_check(item):
+def name_and_priority_check(item):
     item_content = item.split(',')
     if item.count(',') == 2 and len(item_content[0]) != 0:
         if len(item_content[1]) != 0 and item_content[1] not in ['high', 'medium', 'low']:
@@ -74,16 +76,16 @@ def input_check(item):
     else:
         raise InvalidInputError
 
-def test_check_and_add(list_name):
+def validate_and_add(list_name):
     input_is_valid = False
     while not input_is_valid:
         item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or Q to back): ')
         check_result = quit_check_main(item)
         if check_result == 'back to main':
-            break
+            raise BackToMain
         else:
             try:
-                input_check(item)
+                name_and_priority_check(item)
                 add_item(list_name, item)
                 input_is_valid = True
             except PriorityError as err:
@@ -93,44 +95,33 @@ def test_check_and_add(list_name):
             except ValueError:
                 print('Invalid date!')
 
-try:
-    what_to_do = 0
 
-    while what_to_do != 'X':
+try:
+    while True:
         what_to_do = input('What would you like to do? (new, edit, view or delete. X to exit the app) ')
         check_result = quit_app(what_to_do)
-        if check_result == 'new':
-            list_name = input('Enter the name of the new list (X to exit the app or Q to back): ')
-            check_result = quit_check_main(list_name)
-            print(check_result)
-            if check_result == list_name:
-                test_check_and_add(list_name)
-                while check_result not in ['back to main', 'back to sub']:
-                    check_if_add_more = input('Add more? (X to exit the app, Q to quit, Y for Yes) ')
-                    check_result = quit_check_main(check_if_add_more)
-                    if check_result == 'back to main':
-                        break
-                    elif check_result == 'Y':
-                        test_check_and_add(list_name)
-                    else:
-                        print('Invalid input!')
-        elif check_result == 'edit':
-            print('to edit')
-        elif check_result == 'delete':
-            print('to delete')
-        elif check_result == 'view':
-            print('to view')
-        else:
-            print('Invalid input!')
-
-
-
-
+        try:
+            if check_result == 'new':
+                list_name = input('Enter the name of the new list (X to exit the app or Q to back): ')
+                check_result = quit_check_main(list_name)
+                if check_result == list_name:
+                    validate_and_add(list_name)
+                    while True:
+                        check_if_add_more = input('Add more? (X to exit the app, Q to quit, Y for Yes) ')
+                        check_result = quit_check_main(check_if_add_more)
+                        if check_result == 'Y':
+                            validate_and_add(list_name)
+                        else:
+                            print('Invalid input!')
+            elif check_result == 'edit':
+                print('to edit')
+            elif check_result == 'delete':
+                print('to delete')
+            elif check_result == 'view':
+                print('to view')
+            else:
+                print('Invalid input!')
+        except BackToMain as err:
+            print(err)
 except KeyboardInterrupt:
     print('You have existed the app!')
-
-
-
-
-
-
