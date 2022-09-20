@@ -274,7 +274,9 @@ try:
                                                         print(f'Which element of \'{selected_item_name}\' would you like to edit ?')
                                                         match element_selection():
                                                             case 'Name':
-                                                                pass
+                                                                new_name = input('Enter the new name of the item (X to exit the app, Q to back to Main Menu or q to back to the upper level menu): ')
+                                                                quit_check_sub(new_name)
+                                                                selected_item['Name'] = new_name
                                                             case 'Priority':
                                                                 pass
                                                             case 'Due date':
