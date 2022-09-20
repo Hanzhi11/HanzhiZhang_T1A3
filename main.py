@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from typing import ItemsView
 
 from simple_term_menu import TerminalMenu
 
@@ -172,7 +173,7 @@ def add_more_decision():
     else:
         return options[menu_entry_index]
 
-def add_more_decision_edit():
+def yes_upper_main_decision():
     options = ['Yes', 'Back to the upper level menu', 'Back to Main menu', 'Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
@@ -210,13 +211,13 @@ def item_selection(item_name_list):
     elif menu_entry_index == len(options) - 3:
         raise BackToUpper
     else:
-        return options[menu_entry_index]
+        return menu_entry_index
 
 def how_to_edit_selection():
-    options = ['Add new item', 'Modify the existing item', 'Delete the existing item', 'Back to the upper level menu', 'Back to Main menu', 'Exit the app']
+    options = ['Add a new item', 'Modify an existing item', 'Remove an existing item', 'Back to the upper level menu', 'Back to Main menu', 'Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected the \'{options[menu_entry_index]}\' item to edit!")
+    print(f"You have selected: \'{options[menu_entry_index]}\'!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
@@ -254,6 +255,14 @@ def priority_selection():
     else:
         return options[menu_entry_index]
 
+def remove_item(selected_list_name):
+    print('Select which item to be deleted:')
+    item_name_list = [item['Name'] for item in list_collection[selected_list_name]]
+    selected_item_index = item_selection(item_name_list)
+    deleted_item_name = item_name_list[selected_item_index]
+    del list_collection[selected_list_name][selected_item_index]
+    print(f'Item \'{deleted_item_name}\' has been removed from the list!')
+
 
 try:
     while True:
@@ -289,16 +298,16 @@ try:
                                             try:
                                                 while True:
                                                     match selected_edit_method:
-                                                        case 'Add new item':                                                            
+                                                        case 'Add a new item':                                                            
                                                             validate_and_add_edit(selected_list_name)
                                                             while True:
                                                                 print('Would you like to add another item?')
-                                                                add_more_decision_edit()
+                                                                yes_upper_main_decision()
                                                                 validate_and_add_edit(selected_list_name)
-                                                        case 'Modify the existing item':
+                                                        case 'Modify an existing item':
                                                             item_name_list = [item['Name'] for item in list_collection[selected_list_name]]
                                                             print(item_name_list)
-                                                            selected_item_name = item_selection(item_name_list)
+                                                            selected_item_name = item_name_list[item_selection(item_name_list)]
                                                             selected_item = [item for item in list_collection[selected_list_name] if item['Name'] == selected_item_name]
                                                             print(selected_item)
                                                             try:
@@ -313,18 +322,15 @@ try:
                                                                                 new_name = input('Enter the new name (X to exit the app, Q to back to Main Menu or q to back to the upper level menu): ')
                                                                                 quit_check_sub(new_name)
                                                                                 selected_item[0]['Name'] = new_name
-                                                                                print(f"The item name has been successfully amended to {selected_item[0]['Name']}.")
-                                                                                print(selected_item_name)
-                                                                                print(list_collection)                                                               
+                                                                                print(f"The item name has been successfully amended to {selected_item[0]['Name']}.")                                                              
                                                                             case 'Priority':
                                                                                 print('Select a new priority level:')
                                                                                 print(f"The current priority level is {selected_item[0]['Priority']}.")
                                                                                 new_priority = priority_selection()    
                                                                                 selected_item[0]['Priority'] = new_priority
                                                                                 print(f"The priority level has been successfully amended to {selected_item[0]['Priority']}.")
-                                                                                print(selected_item_name)
+                                                                                items = list(list_collection[selected_list_name])
                                                                                 sort_items(selected_list_name, items)
-                                                                                print(list_collection) 
                                                                             case 'Due date':
                                                                                 print(f"The current due date is {selected_item[0]['Due date']}.")
                                                                                 date_format = False
@@ -337,17 +343,24 @@ try:
                                                                                         selected_item[0]['Due date'] = converted_new_due_date
                                                                                         date_format = True
                                                                                         print(f"The due date has been successfully amended to {selected_item[0]['Due date']}.")
-                                                                                        print(selected_item_name)
+                                                                                        items = list(list_collection[selected_list_name])
                                                                                         sort_items(selected_list_name, items)
-                                                                                        print(list_collection)
                                                                                     except ValueError:
                                                                                         print('Invalid date format. Try again!')    
                                                                     except BackToUpper as err:
                                                                         print(err)
                                                             except BackToUpper as err:
                                                                 print(err)
-                                                        case 'Delete the existing item':
-                                                            del list_collection[selected_list_name]
+                                                        case 'Remove an existing item':
+                                                            remove_item(selected_list_name)
+                                                            items = list(list_collection[selected_list_name])
+                                                            while len(list_collection[selected_list_name]) != 0:
+                                                                print('Would you like to remove another item?')
+                                                                yes_upper_main_decision()
+                                                                remove_item(selected_list_name)
+                                                                items = list(list_collection[selected_list_name])
+                                                            print(f'The {selected_list_name} list is now empty!')
+                                                            break
                                             except BackToUpper as err:
                                                 print(err)
                                     except BackToUpper as err:
