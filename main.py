@@ -1,5 +1,4 @@
 from datetime import date, timedelta, datetime
-from typing import ItemsView
 
 from simple_term_menu import TerminalMenu
 
