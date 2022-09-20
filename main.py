@@ -282,7 +282,6 @@ try:
                                     print('Select which list you would like to edit:')
                                     selected_list_name = list_selection(list_names)
                                     items = list(list_collection[selected_list_name])
-
                                     try:
                                         while True:                                                                    
                                             print(f'How would you like to edit the \'{selected_list_name}\' list?')
@@ -290,8 +289,7 @@ try:
                                             try:
                                                 while True:
                                                     match selected_edit_method:
-                                                        case 'Add new item':
-                                                            
+                                                        case 'Add new item':                                                            
                                                             validate_and_add_edit(selected_list_name)
                                                             while True:
                                                                 print('Would you like to add another item?')
@@ -349,7 +347,7 @@ try:
                                                             except BackToUpper as err:
                                                                 print(err)
                                                         case 'Delete the existing item':
-                                                            pass
+                                                            del list_collection[selected_list_name]
                                             except BackToUpper as err:
                                                 print(err)
                                     except BackToUpper as err:
