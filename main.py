@@ -2,7 +2,11 @@ from datetime import date, timedelta, datetime
 
 from simple_term_menu import TerminalMenu
 
-list_collection = {}
+from rich.console import Console 
+
+from rich.table import Table
+
+list_collection = {'first':[{'Name': 'walk dog', 'Priority': '3', 'Due date': datetime.strptime('2/3/22', '%d/%m/%y')}, {'Name': 'dishwashing', 'Priority': '1', 'Due date': datetime.strptime('2/3/22', '%d/%m/%y')}], 'second':[{'Name': 'do laundry', 'Priority': '2', 'Due date': datetime.strptime('22/9/22', '%d/%m/%y')}]}
 class ItemContent:
     def __init__(self, name, priority, due_date):
         self.name = name
@@ -306,6 +310,30 @@ def delete_list(list_names):
     del list_collection[selected_list_name]
     print(f'List \'{selected_list_name}\' has been deleted!')
 
+# def priority_color():
+
+
+def view_list(list_names):
+    print('Select which list you would like to view:')
+    selected_list_name = list_selection(list_names)
+    selected_list = list_collection[selected_list_name]
+
+    display_list = Table(title = selected_list_name.upper())
+
+    display_list.add_column('Item Number', style = 'red', justify = 'center')
+    display_list.add_column('Item Name', style = 'cyan')
+    display_list.add_column('Priority Level', style = 'magenta', justify = 'center')
+    display_list.add_column('Due Date', style = 'green')
+
+    for i in range (len(selected_list)):
+        # display_list.add_row('h','f', 's', 's')
+        display_list.add_row(str(i + 1), selected_list[i]['Name'], selected_list[i]['Priority'], datetime.strftime(selected_list[i]['Due date'], '%d/%m/%y'))
+
+    console = Console()
+    console.print(display_list)
+
+
+
 try:
     while True:
         print('What would you like to do?')
@@ -420,8 +448,7 @@ try:
                                 print(err)
                 case 'Delete an existing list':
                     list_collection_check()
-                    list_names = list(list_collection.keys())
-                    print(list_names)                             
+                    list_names = list(list_collection.keys())                          
                     delete_list(list_names)
                     while len(list_collection) != 0:
                         print('Would you like to delete another list?')
@@ -429,7 +456,10 @@ try:
                         delete_list(list_names)
                     print('The list collection is now empty!')
                 case 'View an existing list':
-                    pass
+                    list_collection_check()
+                    list_names = list(list_collection.keys())
+                    view_list(list_names)
+
         except BackToMain as err:
             print(err)
         except EmptyListCollection as err:
