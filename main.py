@@ -1,12 +1,17 @@
+from collections import deque
 from datetime import date, timedelta, datetime
-
+from turtle import bgcolor
+from types import NoneType
 from simple_term_menu import TerminalMenu
-
-from rich.console import Console 
-
+from rich.console import Console
 from rich.table import Table
+from rich.text import Text
+from rich.bar import Bar
+from rich import box, style
 
-list_collection = {'first':[{'Name': 'walk dog', 'Priority': '3', 'Due date': datetime.strptime('2/3/22', '%d/%m/%y')}, {'Name': 'dishwashing', 'Priority': '1', 'Due date': datetime.strptime('2/3/22', '%d/%m/%y')}], 'second':[{'Name': 'do laundry', 'Priority': '2', 'Due date': datetime.strptime('22/9/22', '%d/%m/%y')}]}
+# list_collection = {}
+
+list_collection = {'first':[{'Name': 'walk dog', 'Priority': '3', 'Due date': datetime.strptime('2/3/22', '%d/%m/%y').date()}, {'Name': 'shopping', 'Priority': '2', 'Due date': datetime.strptime('21/9/22', '%d/%m/%y').date()}, {'Name': 'dishwashing', 'Priority': '1', 'Due date': datetime.strptime('2/10/22', '%d/%m/%y').date()}], 'second':[{'Name': 'do laundry', 'Priority': '2', 'Due date': datetime.strptime('22/9/22', '%d/%m/%y').date()}]}
 class ItemContent:
     def __init__(self, name, priority, due_date):
         self.name = name
@@ -310,27 +315,41 @@ def delete_list(list_names):
     del list_collection[selected_list_name]
     print(f'List \'{selected_list_name}\' has been deleted!')
 
-# def priority_color():
-
-
 def view_list(list_names):
     print('Select which list you would like to view:')
     selected_list_name = list_selection(list_names)
     selected_list = list_collection[selected_list_name]
 
-    display_list = Table(title = selected_list_name.upper())
+    display_list = Table(title = f'\n{selected_list_name.upper()}', title_style = 'yellow', header_style = 'italic bold', box = box.HORIZONTALS, row_styles = [style.Style(bgcolor = '#aaaaaa'), ''])
 
-    display_list.add_column('Item Number', style = 'red', justify = 'center')
-    display_list.add_column('Item Name', style = 'cyan')
-    display_list.add_column('Priority Level', style = 'magenta', justify = 'center')
-    display_list.add_column('Due Date', style = 'green')
+    display_list.add_column('Item Number\n', style = 'white', justify = 'center')
+    display_list.add_column('Item Name\n', style = 'cyan')
+    display_list.add_column('Priority Level\n(Low - Medium - High)', style = 'magenta', justify = 'center')
+    display_list.add_column('Due Date\n', style = 'green')
+
+    long_bar = Bar(size = 1, begin = 0.67, end = 1, width = 30, color = 'red', bgcolor = None)
+    medium_bar = Bar(size = 1, begin = 0.33, end = 0.67, width = 30, color = 'yellow')
+    short_bar = Bar(size = 1, begin = 0, end = 0.33, width = 30, color = 'green', bgcolor = None)
+
 
     for i in range (len(selected_list)):
-        # display_list.add_row('h','f', 's', 's')
-        display_list.add_row(str(i + 1), selected_list[i]['Name'], selected_list[i]['Priority'], datetime.strftime(selected_list[i]['Due date'], '%d/%m/%y'))
+        due_date = Text(datetime.strftime(selected_list[i]['Due date'], '%d/%m/%y'))
+        priority_level = selected_list[i]['Priority']
+
+        if selected_list[i]['Due date'] < date.today():
+            due_date.stylize('red')
+        if selected_list[i]['Priority'] == '1':
+            priority_level = short_bar
+        elif selected_list[i]['Priority'] == '2':
+            priority_level = medium_bar
+        else:
+            priority_level = long_bar
+
+        display_list.add_row(str(i + 1), selected_list[i]['Name'].lower().capitalize(), priority_level, due_date)
 
     console = Console()
     console.print(display_list)
+
 
 
 
@@ -441,7 +460,7 @@ try:
                                                             remove_item(selected_list_name)
                                                             items = list(list_collection[selected_list_name])
                                                         print(f'The {selected_list_name} list is now empty!')
-                                                        break                                    
+                                                        break
                                     except BackToChooseEditMethod as err:
                                         print(err)
                             except BackToChooseList as err:
@@ -459,7 +478,6 @@ try:
                     list_collection_check()
                     list_names = list(list_collection.keys())
                     view_list(list_names)
-
         except BackToMain as err:
             print(err)
         except EmptyListCollection as err:
