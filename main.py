@@ -52,11 +52,11 @@ class ListNotExist(Exception):
         super().__init__(f'The list \'{list_name}\' does not exist! Try another one!')
 
 def exit_app(input):
-    if input == 'X':
+    if input == 'x':
         raise KeyboardInterrupt
 
 def exit_main_check(input):
-    if input == 'M':
+    if input == 'm':
         raise BackToMain
     else:
         exit_app(input)
@@ -66,7 +66,7 @@ def back_to_upper_menu_check(input):
         raise BackToChooseEditMethod
 
 def back_to_edit_menu_check(input):
-    if input == 'Q':
+    if input == 'l':
         raise BackToChooseList
 
 def modify_another_item_check(input):
@@ -126,7 +126,7 @@ def validate_and_add(list_name):
     while not input_is_valid:
         item_exists = False
         while not item_exists:
-            item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or M to back to Main Menu): ')
+            item = input('Enter the item\'s name, priority and due date DD/MM/YY (x to exit the app or m to back to Main Menu): ')
             item_name = item.split(',')[0]
             item_names = [item['Name'] for item in items]
             item_exists = item_duplicate_check(item_name, item_names)
@@ -147,7 +147,7 @@ def validate_and_add_edit(list_name):
     while not input_is_valid:
         item_exists = False
         while not item_exists:
-            item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app, M to back to Main Menu, Q to choose another list, q to choose another edit method): ')
+            item = input('Enter the item\'s name, priority and due date DD/MM/YY (x to exit the app, m to back to Main Menu, l to choose another list, q to choose another edit method): ')
             item_name = item.split(',')[0]
             item_names = [item['Name'] for item in items]
             item_exists = item_duplicate_check(item_name, item_names)
@@ -177,7 +177,7 @@ def list_check(list_name):
         raise ListNotExist(list_name)
 
 def main_menu_selection():
-    options = ['Create a new list', 'Edit an existing list', 'Delete an existing list', 'View an existing list', 'Exit the app']
+    options = ['[1] Create a new list', '[2] Edit an existing list', '[3] Delete an existing list', '[4] View an existing list', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     print(f"You have selected \'{options[menu_entry_index]}\'!")
@@ -187,7 +187,7 @@ def main_menu_selection():
         return options[menu_entry_index]
 
 def yes_no_decision():
-    options = ['Yes', 'No (Back to Main menu)', 'Exit the app']
+    options = ['[y] Yes', '[n] No (Back to Main menu)', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     print(f"You have selected \'{options[menu_entry_index]}\'!")
@@ -195,38 +195,44 @@ def yes_no_decision():
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
         raise BackToMain
-    else:
-        return options[menu_entry_index]
+    # else:
+    #     return options[menu_entry_index]
 
-def yes_no_main_decision():
-    options = ['Yes', 'No', 'Back to Main menu', 'Exit the app']
-    terminal_menu = TerminalMenu(options)
-    menu_entry_index = terminal_menu.show()
-    print(f"You have selected \'{options[menu_entry_index]}\'!")
-    if menu_entry_index == len(options) - 1:
-        raise KeyboardInterrupt
-    elif menu_entry_index == len(options) - 2:
-        raise BackToMain
-    else:
-        return options[menu_entry_index]
+# def yes_no_main_decision():
+#     options = ['[y] Yes', '[n] No', '[m] Back to Main menu', '[x] Exit the app']
+#     terminal_menu = TerminalMenu(options)
+#     menu_entry_index = terminal_menu.show()
+#     print(f"You have selected \'{options[menu_entry_index]}\'!")
+#     if menu_entry_index == len(options) - 1:
+#         raise KeyboardInterrupt
+#     elif menu_entry_index == len(options) - 2:
+#         raise BackToMain
+#     else:
+#         return options[menu_entry_index]
 
 def list_selection(list_names):
-    options = [*list_names, 'Back to Main menu', 'Exit the app']
+    list_name_options = []
+    for index, name in enumerate(list_names, start = 1):
+        list_name_options.append(f'[{index}] {name}')
+    options = [*list_name_options, '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected the \'{options[menu_entry_index]}\' list!")
+    print(f"You selected: \'{options[menu_entry_index]}\' list!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
         raise BackToMain
     else:
-        return options[menu_entry_index]
+        return list_names[menu_entry_index]
 
-def item_selection(item_name_list):
-    options = [*item_name_list, 'Choose another edit method', 'Choose another list', 'Back to Main menu', 'Exit the app']
+def item_selection(item_names):
+    item_name_options = []
+    for index, name in enumerate(item_names, start = 1):
+        item_name_options.append(f'[{index}] {name}')
+    options = [*item_name_options, '[q] Choose another edit method', '[l] Choose another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected the \'{options[menu_entry_index]}\' item!")
+    print(f"You selected: \'{options[menu_entry_index]}\' item!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
@@ -239,10 +245,10 @@ def item_selection(item_name_list):
         return menu_entry_index
 
 def how_to_edit_selection():
-    options = ['Add a new item', 'Modify an existing item', 'Remove an existing item', 'Choose another list', 'Back to Main menu', 'Exit the app']
+    options = ['[1] Add a new item', '[2] Modify an existing item', '[3] Remove an existing item', '[l] Choose another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected: \'{options[menu_entry_index]}\'!")
+    print(f"You selected: \'{options[menu_entry_index]}\'!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
@@ -253,10 +259,10 @@ def how_to_edit_selection():
         return options[menu_entry_index]
 
 def element_selection():
-    options = ['Name', 'Priority', 'Due date', 'Modify another item', 'Edit another list', 'Back to Main menu', 'Exit the app']
+    options = ['[1] Name', '[2] Priority', '[3] Due date', '[i] Modify another item', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected the \'{options[menu_entry_index]}\' element to edit!")
+    print(f"You selected \'{options[menu_entry_index]}\' element for edit!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
@@ -269,10 +275,10 @@ def element_selection():
         return options[menu_entry_index]
 
 def priority_selection():
-    options = ['1', '2', '3', 'Modify another element', 'Modify another item', 'Edit another list', 'Back to Main menu', 'Exit the app']
+    options = ['[1] 1', '[2] 2', '[3] 3', '[e] Modify another element', '[i] Modify another item', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f"You have selected the \'{options[menu_entry_index]}\' as the new priority level!")
+    print(f"You selected \'{options[menu_entry_index]}\' as the new priority level!")
     if menu_entry_index == len(options) - 1:
         raise KeyboardInterrupt
     elif menu_entry_index == len(options) - 2:
@@ -284,10 +290,10 @@ def priority_selection():
     elif menu_entry_index == len(options) - 5:
         raise BackToChooseElement
     else:
-        return options[menu_entry_index]
+        return menu_entry_index
 
 def continue_selection(selected_list_name, selected_item_name):
-    options = [f'Continue to edit the {selected_item_name} item', f'Continue to edit the {selected_list_name} list', 'Edit another list', 'Back to Main menu', 'Exit the app']
+    options = [f'[1] Continue to edit the {selected_item_name} item', f'[2] Continue to edit the {selected_list_name} list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     print(f"You selected the \'{options[menu_entry_index]}\' option.")
@@ -299,11 +305,11 @@ def continue_selection(selected_list_name, selected_item_name):
         raise BackToChooseList
     elif menu_entry_index == len(options) - 4:
         raise BackToChooseEditMethod
-    else:
-        raise BackToChooseElement
+    # else:
+    #     raise BackToChooseElement
 
 def continue_but_change_selection(selected_list_name):
-    options = ['Yes', f'Continue to edit the \'{selected_list_name}\' list', 'Edit another list', 'Back to Main menu', 'Exit the app']
+    options = ['[y] Yes', f'[n] Continue to edit the \'{selected_list_name}\' list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     print(f"You selected the \'{options[menu_entry_index]}\' option.")
@@ -315,8 +321,8 @@ def continue_but_change_selection(selected_list_name):
         raise BackToChooseList
     elif menu_entry_index == len(options) - 4:
         raise BackToChooseEditMethod
-    else:
-        return options[menu_entry_index]
+    # else:
+    #     return options[menu_entry_index]
 
 def remove_item(selected_list_name):
     print(f'Select which item to be removed from the {selected_list_name} list:')
@@ -370,7 +376,7 @@ def list_name_duplicate_check(input):
         return False
     else:
         return True
-
+    
 
 
 
@@ -379,12 +385,15 @@ try:
         print('What would you like to do?')
         try:
             match main_menu_selection():
-                case 'Create a new list':
+                case '[1] Create a new list':
                     items = []
                     list_name_exists = False
                     while not list_name_exists:
-                        list_name = input('Enter the name of the new list (X to exit the app or M to back to Main Menu): ')
-                        list_name_exists = list_name_duplicate_check(list_name)
+                        list_name = input('Enter the name of the new list (x to exit the app or m to back to Main Menu): ')
+                        if len(list_name) == 0:
+                            print('Empty input!')
+                        else:
+                            list_name_exists = list_name_duplicate_check(list_name)
                     exit_main_check(list_name)
                     validate_and_add(list_name)
                     items = list(list_collection[list_name])
@@ -392,7 +401,7 @@ try:
                         print('Would you like to add another item?')
                         yes_no_decision()
                         validate_and_add(list_name)
-                case 'Edit an existing list':
+                case '[2] Edit an existing list':
                         list_collection_check()
                         list_names = list(list_collection.keys())
                         while True:
@@ -406,13 +415,13 @@ try:
                                     try:
                                         while True:
                                             match selected_edit_method:
-                                                case 'Add a new item':                                                            
+                                                case '[1] Add a new item':                                                            
                                                     validate_and_add_edit(selected_list_name)
                                                     while True:
                                                         print('Would you like to add another item?')
                                                         continue_but_change_selection(selected_list_name)
                                                         validate_and_add_edit(selected_list_name)
-                                                case 'Modify an existing item':                                                            
+                                                case '[2] Modify an existing item':                                                            
                                                     if len(list_collection[selected_list_name]) == 0:
                                                         print(f'The \'{selected_list_name}\' list is empty! Add a new item first!')
                                                         break
@@ -431,9 +440,9 @@ try:
                                                                     selected_element = element_selection()
                                                                     try:
                                                                         match selected_element:
-                                                                            case 'Name':
+                                                                            case '[1] Name':
                                                                                 print(f"The current name is {selected_item[0]['Name']}.")
-                                                                                new_name = input('Enter the new name (X to exit the app, M to back to Main Menu, Q to edit another list, i to modify another item, or e to modify another element): ')
+                                                                                new_name = input('Enter the new name (x to exit the app, m to back to Main Menu, l to edit another list, i to modify another item, or e to modify another element): ')
                                                                                 exit_main_check(new_name)
                                                                                 back_to_edit_menu_check(new_name)
                                                                                 modify_another_item_check(new_name)
@@ -441,7 +450,7 @@ try:
                                                                                 selected_item[0]['Name'] = new_name
                                                                                 print(f"The item name has been successfully amended to {selected_item[0]['Name']}.")
                                                                                 selected_item_name = new_name                                                              
-                                                                            case 'Priority':
+                                                                            case '[2] Priority':
                                                                                 print('Select a new priority level:')
                                                                                 print(f"The current priority level is {selected_item[0]['Priority']}.")
                                                                                 new_priority = priority_selection()    
@@ -449,11 +458,11 @@ try:
                                                                                 print(f"The priority level has been successfully amended to {selected_item[0]['Priority']}.")
                                                                                 items = list(list_collection[selected_list_name])
                                                                                 sort_items(selected_list_name, items)
-                                                                            case 'Due date':
+                                                                            case '[3] Due date':
                                                                                 print(f"The current due date is {selected_item[0]['Due date']}.")
                                                                                 while True:
                                                                                     try:
-                                                                                        new_due_date = input('Enter the new due date DD/MM/YY (X to exit the app, M to back to Main Menu, Q to edit another list, i to modify another item, or e to modify another element): ')    
+                                                                                        new_due_date = input('Enter the new due date DD/MM/YY (x to exit the app, m to back to Main Menu, l to edit another list, i to modify another item, or e to modify another element): ')    
                                                                                         exit_main_check(new_due_date)
                                                                                         back_to_edit_menu_check(new_due_date)
                                                                                         modify_another_item_check(new_due_date)
@@ -472,7 +481,7 @@ try:
                                                                         print (err)                                                                
                                                             except BackToChooseItem as err:
                                                                 print(err)
-                                                case 'Remove an existing item':
+                                                case '[3] Remove an existing item':
                                                     if len(list_collection[selected_list_name]) == 0:
                                                         print(f'The \'{selected_list_name}\' list is empty! Add a new item first!')
                                                         break
@@ -490,7 +499,7 @@ try:
                                         print(err)
                             except BackToChooseList as err:
                                 print(err)
-                case 'Delete an existing list':
+                case '[3] Delete an existing list':
                     list_collection_check()
                     list_names = list(list_collection.keys())                          
                     delete_list(list_names)
@@ -499,7 +508,7 @@ try:
                         yes_no_decision()
                         delete_list(list_names)
                     print('The list collection is now empty!')
-                case 'View an existing list':
+                case '[4] View an existing list':
                     list_collection_check()
                     list_names = list(list_collection.keys())
                     view_list(list_names)
