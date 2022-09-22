@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from datetime import date, datetime
 from simple_term_menu import TerminalMenu
 from rich.console import Console
 from rich.table import Table
