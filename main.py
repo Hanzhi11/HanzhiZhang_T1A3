@@ -114,10 +114,22 @@ def name_and_priority_check(item):
     else:
         raise InvalidInputError
 
+def item_duplicate_check(input, item_names):
+    if input in item_names:
+        print(f'The \'{input}\' item exists already. Use another name!')
+        return False
+    else:
+        return True
+
 def validate_and_add(list_name):
     input_is_valid = False
     while not input_is_valid:
-        item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or M to back to Main Menu): ')
+        item_exists = False
+        while not item_exists:
+            item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app or M to back to Main Menu): ')
+            item_name = item.split(',')[0]
+            item_names = [item['Name'] for item in items]
+            item_exists = item_duplicate_check(item_name, item_names)
         exit_main_check(item)
         try:
             name_and_priority_check(item)
@@ -133,7 +145,12 @@ def validate_and_add(list_name):
 def validate_and_add_edit(list_name):
     input_is_valid = False
     while not input_is_valid:
-        item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app, M to back to Main Menu, Q to choose another list, q to choose another edit method): ')
+        item_exists = False
+        while not item_exists:
+            item = input('Enter the item\'s name, priority and due date DD/MM/YY (X to exit the app, M to back to Main Menu, Q to choose another list, q to choose another edit method): ')
+            item_name = item.split(',')[0]
+            item_names = [item['Name'] for item in items]
+            item_exists = item_duplicate_check(item_name, item_names)
         exit_main_check(item)
         back_to_edit_menu_check(item)
         back_to_upper_menu_check(item)
@@ -328,27 +345,31 @@ def view_list(list_names):
     display_list.add_column('Due Date\n', style = 'green')
 
     long_bar = Bar(size = 1, begin = 0.67, end = 1, width = 30, color = 'red', bgcolor = None)
-    medium_bar = Bar(size = 1, begin = 0.33, end = 0.67, width = 30, color = 'yellow')
+    medium_bar = Bar(size = 1, begin = 0.33, end = 0.67, width = 30, color = 'yellow', bgcolor = None)
     short_bar = Bar(size = 1, begin = 0, end = 0.33, width = 30, color = 'green', bgcolor = None)
 
-
-    for i in range (len(selected_list)):
-        due_date = Text(datetime.strftime(selected_list[i]['Due date'], '%d/%m/%y'))
-        priority_level = selected_list[i]['Priority']
-
-        if selected_list[i]['Due date'] < date.today():
+    for index, item in enumerate(selected_list, start = 1):
+        due_date = Text(datetime.strftime(item['Due date'], '%d/%m/%y'))
+        priority_level = item['Priority']
+        if item['Due date'] < date.today():
             due_date.stylize('red')
-        if selected_list[i]['Priority'] == '1':
+        if item['Priority'] == '1':
             priority_level = short_bar
-        elif selected_list[i]['Priority'] == '2':
+        elif item['Priority'] == '2':
             priority_level = medium_bar
         else:
             priority_level = long_bar
-
-        display_list.add_row(str(i + 1), selected_list[i]['Name'].lower().capitalize(), priority_level, due_date)
+        display_list.add_row(str(index), item['Name'].lower().capitalize(), priority_level, due_date)
 
     console = Console()
     console.print(display_list)
+
+def list_name_duplicate_check(input):
+    if input in list_collection.keys():
+        print(f'The \'{input}\' list exists already. Enter another name.')
+        return False
+    else:
+        return True
 
 
 
@@ -360,9 +381,13 @@ try:
             match main_menu_selection():
                 case 'Create a new list':
                     items = []
-                    list_name = input('Enter the name of the new list (X to exit the app or M to back to Main Menu): ')
+                    list_name_exists = False
+                    while not list_name_exists:
+                        list_name = input('Enter the name of the new list (X to exit the app or M to back to Main Menu): ')
+                        list_name_exists = list_name_duplicate_check(list_name)
                     exit_main_check(list_name)
                     validate_and_add(list_name)
+                    items = list(list_collection[list_name])
                     while True:
                         print('Would you like to add another item?')
                         yes_no_decision()
