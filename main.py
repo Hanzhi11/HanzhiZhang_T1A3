@@ -7,8 +7,6 @@ from rich.bar import Bar
 from rich import box, style
 from rich import print as rprint
 from rich.prompt import Prompt
-
-
 class ListItem:
     def __init__(self, name, priority, due_date):
         self.name = name
@@ -351,13 +349,11 @@ def list_name_duplicate_check(input):
         return False
     else:
         return True
-    
-
-
+   
 
 try:
+    list_collection = {}
     while True:
-        list_collection = {}
         rprint('[italic #00f5d4]What would you like to do?[/italic #00f5d4]')
         try:
             match main_menu_selection():
