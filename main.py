@@ -75,28 +75,6 @@ def modify_another_element_check(input):
     if input == 'e':
         raise BackToChooseElement
 
-def add_item(list_name, item):
-    item_content = item.split(',')
-    item_name = item_content[0].lower()
-    item_priority_level = item_content[1].lower()
-    item_due_date = item_content[2]
-    default_due_date= date.today() + timedelta(days = 1)
-    if len(item_due_date) == 0:
-        if len(item_priority_level) == 0:
-            item_content_details = ListItem(item_name, '2', default_due_date)
-        else:
-            item_content_details = ListItem(item_name, item_priority_level, default_due_date)
-    else:
-        converted_due_date = datetime.strptime(item_due_date, '%d/%m/%y').date()
-        if len(item_priority_level) == 0:
-            item_content_details = ListItem(item_name, '2', converted_due_date)
-        else:
-            item_content_details = ListItem(item_name, item_priority_level, converted_due_date)
-
-    item_details = {'Name': item_content_details.name, 'Priority': item_content_details.priority, 'Due date':item_content_details.due_date}
-    items.append(item_details)
-    sort_items_and_update_list_collection(list_name, items)
-
 def sort_items_and_update_list_collection(selected_list_name, items):
     sorted_item_list = sorted(items, key = lambda item: (item.due_date, item.priority), reverse = True)
     new_list = {selected_list_name: sorted_item_list}
@@ -179,7 +157,7 @@ def obtain_due_date_edit():
         except ValueError:
             rprint('[red]Invalid date![/red]')
 
-def add_item_test1(item_names, list_name):
+def add_item(item_names, list_name):
     item_name = obtain_item_name(item_names)
     priority_level = obtain_prioroty_level()
     due_date = obtain_due_date()
@@ -187,33 +165,6 @@ def add_item_test1(item_names, list_name):
     items.append(new_item)
     sort_items_and_update_list_collection(list_name, items)
     rprint(f"[#00bbf9]The new item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
-
-def validate_and_add_edit(list_name):
-    input_is_valid = False
-    while not input_is_valid:
-        item_exists = False
-        while not item_exists:
-            rprint('[italic #00f5d4]Enter the item\'s name, priority and due date DD/MM/YY:[/italic #00f5d4]')
-            rprint('[italic #38a3a5 underline bold]Note: Use \',\' to seperate the name, priority level and due date[/italic #38a3a5 underline bold]')
-            rprint('[italic #38a3a5 underline bold]      Priority level: 1 for low, 2 for medium, 3 for high[/italic #38a3a5 underline bold]')
-            rprint('[italic #38a3a5 underline bold]      x to exit the app, m to back to Main Menu, l to choose another list, q to choose another edit method[/italic #38a3a5 underline bold]')
-            item = input()
-            item_name = item.split(',')[0]
-            item_names = [item.name for item in items]
-            item_exists = item_duplicate_check(item_name, item_names)
-        exit_main_check(item)
-        back_to_edit_menu_check(item)
-        back_to_upper_menu_check(item)
-        try:
-            name_and_priority_check(item)
-            add_item(list_name, item)
-            input_is_valid = True
-        except PriorityError as err:
-            rprint (f'[red]{err}[/red]')
-        except InvalidInputError as err:
-            rprint (f'[red]{err}[/red]')
-        except ValueError:
-            rprint('[red]Invalid date![/red]')
 
 def date_format_check(new_due_date):
     datetime.strptime(new_due_date, '%d/%m/%y').date()
@@ -421,13 +372,13 @@ try:
                         else:
                             exit_main_check(list_name)
                             list_name_exists = list_name_duplicate_check(list_name)
-                    add_item_test1(item_names, list_name)
+                    add_item(item_names, list_name)
                     items = list(list_collection[list_name])
                     item_names = [item.name for item in items]         
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                         yes_no_decision()
-                        add_item_test1(item_names, list_name)
+                        add_item(item_names, list_name)
                         items = list(list_collection[list_name])
                         item_names = [item.name for item in items] 
                 case '[2] Edit an existing list':
@@ -446,13 +397,13 @@ try:
                                         while True:
                                             match selected_edit_method:
                                                 case '[1] Add a new item':                                                            
-                                                    add_item_test1(item_names, selected_list_name)
+                                                    add_item(item_names, selected_list_name)
                                                     items = list(list_collection[list_name])
                                                     item_names = [item.name for item in items] 
                                                     while True:
                                                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                                                         continue_but_change_selection(selected_list_name)
-                                                        add_item_test1(item_names, selected_list_name)
+                                                        add_item(item_names, selected_list_name)
                                                         items = list(list_collection[list_name])
                                                         item_names = [item.name for item in items] 
                                                 case '[2] Modify an existing item':                                                            
