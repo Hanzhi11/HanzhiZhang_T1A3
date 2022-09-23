@@ -80,7 +80,7 @@ def obtain_item_name(item_names):
         item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
         if len(item_name) != 0:
             exit_main_check(item_name)
-            item_exists = item_duplicate_check(item_name, item_names)
+            item_exists = item_duplicate_check(item_name.lower(), item_names)
         else:
             rprint('[red]Empty Input![/red]')
     return item_name.lower()
@@ -292,7 +292,7 @@ def obtain_list_name(list_collection):
             rprint('[red]Empty input![/red]')
         else:
             exit_main_check(list_name)
-            list_name_exists = list_name_duplicate_check(list_name, list_names(list_collection))
+            list_name_exists = list_name_duplicate_check(list_name.lower(), list_names(list_collection))
     return list_name.lower()
 
 
