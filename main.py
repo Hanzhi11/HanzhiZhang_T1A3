@@ -77,18 +77,18 @@ def item_duplicate_check(input, item_names):
 def obtain_item_name(item_names):
     item_exists = False
     while not item_exists:
-        item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)').lower()
+        item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
         if len(item_name) != 0:
             exit_main_check(item_name)
             item_exists = item_duplicate_check(item_name, item_names)
         else:
             rprint('[red]Empty Input![/red]')
-    return item_name
+    return item_name.lower()
 
 def obtain_new_item_name(item_names):
     item_exists = False
     while not item_exists:
-        item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)').lower()
+        item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)')
         if len(item_name) != 0:
             exit_main_check(item_name)
             back_to_upper_menu_check(item_name)
@@ -96,7 +96,7 @@ def obtain_new_item_name(item_names):
             item_exists = item_duplicate_check(item_name, item_names)
         else:
             rprint('[red]Empty Input![/red]')
-    return item_name
+    return item_name.lower()
 
 def obtain_prioroty_level():
     priority_level = Prompt.ask('Enter priority level', choices = ['1', '2', '3', 'x', 'm'])
@@ -119,7 +119,7 @@ def date_convert_format(due_date):
 def obtain_due_date():
     due_date = None
     while not due_date:
-        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app or m to back to Main Menu)')
+        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app or m to back to Main Menu): ')
         exit_main_check(due_date)
         due_date = date_convert_format(due_date)
     return due_date
@@ -127,7 +127,7 @@ def obtain_due_date():
 def obtain_new_due_date():
     due_date = None
     while not due_date:
-        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)')
+        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method): ')
         exit_main_check(due_date)
         back_to_upper_menu_check(due_date)
         back_to_edit_menu_check(due_date)
@@ -284,6 +284,18 @@ def item_names(items):
 def list_names(list_collection):
     return list(list_collection.keys())
 
+def obtain_list_name(list_collection):
+    list_name_exists = False
+    while not list_name_exists:
+        list_name = Prompt.ask('Enter the name of the new list (x to exit the app or m to back to Main Menu): ')
+        if len(list_name) == 0:
+            rprint('[red]Empty input![/red]')
+        else:
+            exit_main_check(list_name)
+            list_name_exists = list_name_duplicate_check(list_name, list_names(list_collection))
+    return list_name.lower()
+
+
 if __name__ == '__main__':
     try:
         list_collection = {}
@@ -293,14 +305,15 @@ if __name__ == '__main__':
                 selected_main_menu = main_menu_selection()
                 if selected_main_menu == '[1] Create a new list':
                     items = []
-                    list_name_exists = False
-                    while not list_name_exists:
-                        list_name = Prompt.ask('Enter the name of the new list (x to exit the app or m to back to Main Menu)').lower()
-                        if len(list_name) == 0:
-                            rprint('[red]Empty input![/red]')
-                        else:
-                            exit_main_check(list_name)
-                            list_name_exists = list_name_duplicate_check(list_name, list_names(list_collection))
+                    list_name = obtain_list_name(list_collection)
+                    # list_name_exists = False
+                    # while not list_name_exists:
+                    #     list_name = input('Enter the name of the new list (x to exit the app or m to back to Main Menu)').lower()
+                    #     if len(list_name) == 0:
+                    #         rprint('[red]Empty input![/red]')
+                    #     else:
+                    #         exit_main_check(list_name)
+                    #         list_name_exists = list_name_duplicate_check(list_name, list_names(list_collection))
                     add_item(item_names(items), list_name)
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
