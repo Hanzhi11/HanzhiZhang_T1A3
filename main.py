@@ -257,17 +257,17 @@ def view_list(list_names):
     short_bar = Bar(size = 1, begin = 0, end = 0.33, width = 21, color = 'green', bgcolor = None)
 
     for index, item in enumerate(list_collection[selected_list_name], start = 1):
-        due_date = Text(datetime.strftime(item.due_date, '%d/%m/%y'))
+        str_due_date = Text(datetime.strftime(item.due_date, '%d/%m/%y'))
         priority_level = item.priority
         if item.due_date < date.today():
-            due_date.stylize('red')
+            str_due_date.stylize('red')
         if item.priority == '1':
             priority_level = short_bar
         elif item.priority == '2':
             priority_level = medium_bar
         else:
             priority_level = long_bar
-        display_list.add_row(str(index), item.name.capitalize(), priority_level, due_date)
+        display_list.add_row(str(index), item.name.capitalize(), priority_level, str_due_date)
 
     console = Console()
     rprint(f'[#fee440]You are viewing the \'{selected_list_name}\' list![/#fee440]')
