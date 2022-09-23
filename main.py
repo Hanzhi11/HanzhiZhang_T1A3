@@ -393,8 +393,7 @@ if __name__ == '__main__':
                         rprint('[red]The list collection is now empty![/red]')
                     case '[4] View an existing list':
                         empty_list_collection_check()
-                        list_names = list(list_collection.keys())
-                        view_list(list_names)
+                        view_list(list_names(list_collection))
             except BackToMain as err:
                 rprint (f'[#fee440]{err}[/#fee440]')
             except EmptyListCollection as err:
