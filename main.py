@@ -50,10 +50,9 @@ def exit_app(input):
         raise KeyboardInterrupt
 
 def exit_main_check(input):
+    exit_app(input)
     if input == 'm':
         raise BackToMain
-    else:
-        exit_app(input)
 
 def back_to_upper_menu_check(input):
     if input == 'q':
@@ -63,9 +62,9 @@ def back_to_edit_menu_check(input):
     if input == 'l':
         raise BackToChooseList
 
-def sort_items_and_update_list_collection(selected_list_name, items):
+def sort_items_and_update_list_collection(list_name, items):
     sorted_item_list = sorted(items, key = lambda item: (item.due_date, item.priority), reverse = True)
-    new_list = {selected_list_name: sorted_item_list}
+    new_list = {list_name: sorted_item_list}
     list_collection.update(new_list)
     return sorted_item_list
 
@@ -90,7 +89,7 @@ def obtain_item_name(item_names):
 def obtain_new_item_name(item_names):
     item_exists = False
     while not item_exists:
-        item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)')
+        item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)').lower()
         if len(item_name) != 0:
             exit_main_check(item_name)
             back_to_upper_menu_check(item_name)
@@ -98,8 +97,7 @@ def obtain_new_item_name(item_names):
             item_exists = item_duplicate_check(item_name, item_names)
         else:
             rprint('[red]Empty Input![/red]')
-    else:
-        return item_name
+    return item_name
 
 def obtain_prioroty_level():
     priority_level = Prompt.ask('Enter priority level', choices = ['1', '2', '3', 'x', 'm'])
@@ -113,40 +111,39 @@ def obtain_new_prioroty_level():
     back_to_edit_menu_check(priority_level)
     return priority_level
 
+def date_convert_format(due_date):
+    try:
+        due_date = datetime.strptime(due_date, '%d/%m/%y').date()
+        return due_date
+    except ValueError:
+        rprint('[red]Invalid date![/red]')
+
 def obtain_due_date():
-    while True:
+    due_date = None
+    while not due_date:
         due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app or m to back to Main Menu)')
         exit_main_check(due_date)
-        try:
-            date_format_check(due_date)
-            return due_date
-        except ValueError:
-            rprint('[red]Invalid date![/red]')
+        due_date = date_convert_format(due_date)
+    return due_date
 
 def obtain_new_due_date():
-    while True:
+    due_date_valid = False
+    while not due_date_valid:
         due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method)')
         exit_main_check(due_date)
         back_to_upper_menu_check(due_date)
         back_to_edit_menu_check(due_date)
-        try:
-            date_format_check(due_date)
-            return due_date
-        except ValueError:
-            rprint('[red]Invalid date![/red]')
+        due_date_valid = date_convert_format(due_date)
+    return due_date
 
 def add_item(item_names, list_name):
     item_name = obtain_item_name(item_names)
     priority_level = obtain_prioroty_level()
-    due_date = obtain_due_date()
-    converted_due_date = datetime.strptime(due_date, '%d/%m/%y').date()
+    converted_due_date = obtain_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
     items.append(new_item)
     sort_items_and_update_list_collection(list_name, items)
     rprint(f"[#00bbf9]The new item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
-
-def date_format_check(new_due_date):
-    datetime.strptime(new_due_date, '%d/%m/%y').date()
 
 def empty_list_collection_check():
     if len(list_collection) == 0:
@@ -158,17 +155,13 @@ def main_menu_selection():
     menu_entry_index = terminal_menu.show()
     if menu_entry_index == 4:
         raise KeyboardInterrupt
-    else:
-        return options[menu_entry_index]
+    return options[menu_entry_index]
 
 def yes_no_decision():
     options = ['[y] Yes', '[n] No (Back to Main menu)', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == 2:
-        raise KeyboardInterrupt
-    elif menu_entry_index == 1:
-        raise BackToMain
+    exit_main_quit(options, menu_entry_index)
 
 def list_selection(list_names):
     list_name_options = []
@@ -177,12 +170,8 @@ def list_selection(list_names):
     options = [*list_name_options, '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == len(options) - 1:
-        raise KeyboardInterrupt
-    elif menu_entry_index == len(options) - 2:
-        raise BackToMain
-    else:
-        return list_names[menu_entry_index]
+    exit_main_quit(options, menu_entry_index)
+    return list_names[menu_entry_index]
 
 def item_selection(item_names):
     item_name_options = []
@@ -191,77 +180,59 @@ def item_selection(item_names):
     options = [*item_name_options, '[q] Choose another edit method', '[l] Choose another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == len(options) - 1:
-        raise KeyboardInterrupt
-    elif menu_entry_index == len(options) - 2:
-        raise BackToMain
-    elif menu_entry_index == len(options) - 3:
-        raise BackToChooseList
-    elif menu_entry_index == len(options) - 4:
-        raise BackToChooseEditMethod
-    else:
-        return menu_entry_index
+    exit_main_list_method_quit(options, menu_entry_index)
+    return menu_entry_index
 
 def how_to_edit_selection():
     options = ['[1] Add a new item', '[2] Modify an existing item', '[3] Remove an existing item', '[l] Choose another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == 5:
-        raise KeyboardInterrupt
-    elif menu_entry_index == 4:
-        raise BackToMain
-    elif menu_entry_index == 3:
-        raise BackToChooseList
-    else:
-        return options[menu_entry_index]
+    exit_main_list_quit(options, menu_entry_index)
+    return options[menu_entry_index]
 
 def element_selection():
     options = ['[1] Name', '[2] Priority', '[3] Due date', '[i] Modify another item', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == 6:
-        raise KeyboardInterrupt
-    elif menu_entry_index == 5:
-        raise BackToMain
-    elif menu_entry_index == 4:
-        raise BackToChooseList
-    elif menu_entry_index == 3:
+    exit_main_list_quit(options, menu_entry_index)
+    if menu_entry_index == 3:
         raise BackToChooseItem
-    else:
-        return options[menu_entry_index]
+    return options[menu_entry_index]
 
-def continue_selection(selected_list_name, selected_item_name):
-    options = [f'[1] Continue to edit the \'{selected_item_name}\' item', f'[2] Continue to edit the current {selected_list_name} list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
+def continue_selection(list_name, item_name):
+    options = [f'[1] Continue to edit the \'{item_name}\' item', f'[2] Continue to edit the current {list_name} list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == 4:
-        raise KeyboardInterrupt
-    elif menu_entry_index == 3:
-        raise BackToMain
-    elif menu_entry_index == 2:
-        raise BackToChooseList
-    elif menu_entry_index == 1:
-        raise BackToChooseEditMethod
+    exit_main_list_method_quit(options, menu_entry_index)
 
-def continue_but_change_selection(selected_list_name):
-    options = ['[y] Yes', f'[n] Continue to edit the \'{selected_list_name}\' list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
+def continue_but_change_selection(list_name):
+    options = ['[y] Yes', f'[n] Continue to edit the \'{list_name}\' list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    if menu_entry_index == 4:
-        raise KeyboardInterrupt
-    elif menu_entry_index == 3:
-        raise BackToMain
-    elif menu_entry_index == 2:
-        raise BackToChooseList
-    elif menu_entry_index == 1:
-        raise BackToChooseEditMethod
+    exit_main_list_method_quit(options, menu_entry_index)
 
-def remove_item(selected_list_name):
-    rprint(f'[italic #00f5d4]Select which item to be removed from the {selected_list_name} list:[/italic #00f5d4]')
-    item_name_list = [item.name for item in list_collection[selected_list_name]]
+def exit_main_quit(options, menu_entry_index):
+    if menu_entry_index == len(options) - 1:
+        raise KeyboardInterrupt
+    elif menu_entry_index == len(options) - 2:
+        raise BackToMain
+
+def exit_main_list_quit(options, menu_entry_index):
+    if menu_entry_index == len(options) - 3:
+        raise BackToChooseList
+    exit_main_quit(options, menu_entry_index)
+
+def exit_main_list_method_quit(options, menu_entry_index):
+    if menu_entry_index == len(options) - 4:
+        raise BackToChooseEditMethod
+    exit_main_list_quit(options, menu_entry_index)
+
+def remove_item(list_name):
+    rprint(f'[italic #00f5d4]Select which item to be removed from the {list_name} list:[/italic #00f5d4]')
+    item_name_list = [item.name for item in list_collection[list_name]]
     selected_item_index = item_selection(item_name_list)
-    deleted_item_name = item_name_list[selected_item_index]
-    del list_collection[selected_list_name][selected_item_index]
+    deleted_item_name = list_collection[list_name][selected_item_index].name
+    del list_collection[list_name][selected_item_index]
     rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the list![#00bbf9]')
 
 def delete_list(list_names):
@@ -273,7 +244,6 @@ def delete_list(list_names):
 def view_list(list_names):
     rprint('[italic #00f5d4]Select which list you would like to view:[/italic #00f5d4]')
     selected_list_name = list_selection(list_names)
-    selected_list = list_collection[selected_list_name]
 
     display_list = Table(title = f'\n{selected_list_name.upper()}', title_style = '#f15bb5', min_width = 50, header_style = 'italic bold', box = box.HORIZONTALS, row_styles = [style.Style(bgcolor = '#aaaaaa'), ''])
 
@@ -286,7 +256,7 @@ def view_list(list_names):
     medium_bar = Bar(size = 1, begin = 0.33, end = 0.67, width = 21, color = 'yellow', bgcolor = None)
     short_bar = Bar(size = 1, begin = 0, end = 0.33, width = 21, color = 'green', bgcolor = None)
 
-    for index, item in enumerate(selected_list, start = 1):
+    for index, item in enumerate(list_collection[selected_list_name], start = 1):
         due_date = Text(datetime.strftime(item.due_date, '%d/%m/%y'))
         priority_level = item.priority
         if item.due_date < date.today():
