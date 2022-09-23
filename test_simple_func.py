@@ -1,6 +1,7 @@
 import pytest
 
-from main import BackToChooseEditMethod, BackToMain, BackToChooseList, exit_app, exit_main_check, back_to_upper_menu_check, back_to_edit_menu_check, list_name_duplicate_check, item_duplicate_check, date_format_check
+from main import BackToChooseEditMethod, BackToMain, BackToChooseList, exit_app, exit_main_check, back_to_upper_menu_check, back_to_edit_menu_check, list_name_duplicate_check, item_duplicate_check, date_convert_format
+
 inputs = iter([])
 
 def fake_input(prompt):
@@ -63,16 +64,12 @@ class TestItemDuplicate:
 
 class TestDateFormat:
     def test_valid(self):
-        assert date_format_check('2/2/22') == None
-        assert date_format_check('02/02/22') == None
+        assert date_convert_format('2/2/22')
+        assert date_convert_format('02/02/22')
 
     def test_invalid(self):
-        with pytest.raises(ValueError):
-            date_format_check('2/2')
-            date_format_check('2')
-            date_format_check('2/')
-            date_format_check('2/2/2')
-            date_format_check('2/2/')
+        assert date_convert_format('2/2') == None
+
 
 
 
