@@ -385,12 +385,11 @@ if __name__ == '__main__':
                                     rprint (f'[#fee440]{err}[/#fee440]')
                     case '[3] Delete an existing list':
                         empty_list_collection_check()
-                        list_names = list(list_collection.keys())                          
-                        delete_list(list_names)
+                        delete_list(list_names(list_collection))
                         while len(list_collection) != 0:
                             rprint('[italic #00f5d4]Would you like to delete another list?[/italic #00f5d4]')
                             yes_no_decision()
-                            delete_list(list_names)
+                            delete_list(list_names(list_collection))
                         rprint('[red]The list collection is now empty![/red]')
                     case '[4] View an existing list':
                         empty_list_collection_check()
