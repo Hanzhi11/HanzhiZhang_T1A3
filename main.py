@@ -261,7 +261,7 @@ def item_names(items):
 def list_names(list_collection):
     return list(list_collection.keys())
 
-def obtain_list_name(list_collection):
+def obtain_list_name():
     list_name_exists = False
     while not list_name_exists:
         list_name = Prompt.ask('Enter the name of the new list (x to exit the app or m to back to Main Menu)')
@@ -283,7 +283,7 @@ if __name__ == '__main__':
                 # create a new list
                 if selected_main_menu == '[1] Create a new list':
                     items = []
-                    list_name = obtain_list_name(list_collection)
+                    list_name = obtain_list_name()
                     add_item(list_name)
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
