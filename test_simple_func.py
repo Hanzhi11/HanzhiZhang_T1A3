@@ -51,6 +51,14 @@ class TestToEdit:
     def test_not_to_edit(self):
         assert main.back_to_edit_menu_check('m') is None
 
+class TestChooseAnotherElement:
+    def test_choose_another_one(self):
+        with pytest.raises(main.BackToChooseElement):
+            main.select_another_element('e')
+    
+    def test_not_to_choose(self):
+        assert main.select_another_element('m') is None
+
 class TestListNameDuplicate:
     def test_valid(self):
         assert main.list_name_duplicate_check('a', ['b', 'c'])
