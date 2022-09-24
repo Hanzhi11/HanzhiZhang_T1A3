@@ -78,9 +78,11 @@ class TestChooseAnotherElement:
 
 # test the function which is used to check if user's input has been used as a list name already
 class TestListNameDuplicate:
-    # valid input
+    # valid input - case insensitive
     def test_valid(self):
-        assert main.list_name_duplicate_check('a', ['b', 'c']) is True
+        assert main.list_name_duplicate_check('a', ['b', 'c']) == 'a'
+        assert main.list_name_duplicate_check('A', ['b', 'c']) == 'a'
+
 
     # invalid input (been used already)
     def test_duplicate(self):
@@ -123,7 +125,7 @@ class TestObtainListName:
 class TestItemDuplicate:
     # valid input
     def test_valid(self):
-        assert main.item_duplicate_check('shopping', ['dishwashing', 'walk dog', 'do laundry']) is True
+        assert main.item_duplicate_check('shopping', ['dishwashing', 'walk dog', 'do laundry']) == 'shopping'
 
     # invalid input - duplicates
     def test_duplicate(self):
