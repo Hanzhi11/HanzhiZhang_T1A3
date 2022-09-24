@@ -11,8 +11,31 @@ from to_do_list_class import EmptyList, BackToMain, BackToChooseEditMethod, Back
 
 inputs = iter(['2', 'M', 'X', 'secondlist', 'Firstlist', '1', 'firstList', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', '', 'x', 'm', '2/2/22', '03/03/33', '2', '2/', 's', 'x', 'm', '1', 'do laundry','shopping', 'Shopping', ''])
 
+test_cases = iter(['1', '2', '3', 'test', '1', '2022-3-2', 0, 0, 1, 1])
+
 def fake_input(prompt):
     return next(inputs)
+
+def fake_selection(options):
+    return next(test_cases)
+
+def fake_name(all_item_names):
+    return next(test_cases)
+
+def fake_level():
+    return next(test_cases)
+
+def fake_date():
+    return next(test_cases)
+
+def fake_item(fake_name, fake_level, fake_date):
+    return f'Item name: {fake_name}, Priority: {fake_level}, Due on: {fake_date}'
+
+def fake_option(prompt, choices):
+    return next(test_cases)
+
+def fake_names(collection):
+    return ['shopping', 'dishwashing']
 
 # Test Quit functions 
 # test exit app function
@@ -204,6 +227,28 @@ class TestObtainDueDate:
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
             main.obtain_due_date(running_time_for_test = 1)
 
+# test the function which is used to get a priority level from the user
+class TestGetPriority:
+    def test_get_priority(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_option) # test case ['1', '2', '3']
+        assert main.obtain_priority_level() == '1'
+        assert main.obtain_priority_level() == '2'
+        assert main.obtain_priority_level() == '3'
+
+# test the function to add an item to a list
+class TestAddItem:
+    def test_add_item(self, monkeypatch):
+        monkeypatch.setattr(main, 'obtain_item_name', fake_name) # test case ['test']
+        monkeypatch.setattr(main, 'obtain_priority_level', fake_level) # test case ['1']
+        monkeypatch.setattr(main, 'obtain_due_date', fake_date) # test case ['2022-3-2']
+        monkeypatch.setattr(main, 'ListItem', fake_item)
+        
+        list_name = 'first'
+        list_content = ['Item name: shopping, Priority: 1, Due on: 2022-2-2', 'Item name: do laundry, Priority: 2, Due on: 2022-2-1']
+        all_item_names = ['shopping', 'do laundry']
+        result = ['Item name: shopping, Priority: 1, Due on: 2022-2-2', 'Item name: do laundry, Priority: 2, Due on: 2022-2-1', 'Item name: test, Priority: 1, Due on: 2022-3-2']
+        assert main.add_item(list_name, list_content, all_item_names) == result
+
 # Test some essential functions relating to the edit an existing list feature
 # test if the list which the following code works on is empty or not
 class TestEmptyList:
@@ -257,15 +302,18 @@ class TestUpdateItemName:
         assert main.update_item_name(['shopping'], running_time_for_test = 1) is False
 
 
-
-
-
-
-
-
-
-
-
+# test the function which is used to remove an item from the list
+class TestRemoveItem:
+    item_name_list = ['shopping', 'dishwashing']
+    def test_remove(self, monkeypatch):
+        monkeypatch.setattr(main, 'item_selection', fake_selection) # test case [0, 0, 1, 1]
+        monkeypatch.setattr('main.item_names', fake_names) # test case ['shopping', 'dishwashing']
+        list_name = 'first'
+        list_collection = {'first': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
+        result0 = {'first': [{'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
+        result1 = {'first': [], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
+        assert main.remove_item(list_name, list_collection) == result0
+        assert main.remove_item(list_name, list_collection) == result1
 
 
 

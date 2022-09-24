@@ -257,9 +257,9 @@ def exit_main_list_method_quit(options, menu_entry_index):
 
 def remove_item(list_name, list_collection):
     rprint(f'[italic #00f5d4]Select which item to be removed from the {list_name} list:[/italic #00f5d4]')
-    item_name_list = [item.name for item in list_collection[list_name]]
+    item_name_list = item_names(list_collection[list_name])
     selected_item_index = item_selection(item_name_list)
-    deleted_item_name = list_collection[list_name][selected_item_index].name
+    deleted_item_name = item_name_list[selected_item_index]
     del list_collection[list_name][selected_item_index]
     rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the list![#00bbf9]')
     return list_collection
