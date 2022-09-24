@@ -6,11 +6,15 @@ from datetime import datetime
 
 import main
 
-inputs = iter(['2', 'M', 'X', 'secondlist', 'Firstlist', '1', 'firstList', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', 'x', 'm', '2/2/22', '03/03/33', '2', '2/', 's', 'x', 'm'])
+from to_do_list_class import EmptyList, BackToMain, BackToChooseEditMethod, BackToChooseElement, BackToChooseList, EmptyListCollection
+
+
+inputs = iter(['2', 'M', 'X', 'secondlist', 'Firstlist', '1', 'firstList', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', '', 'x', 'm', '2/2/22', '03/03/33', '2', '2/', 's', 'x', 'm', '1', 'do laundry','shopping', 'Shopping', ''])
 
 def fake_input(prompt):
     return next(inputs)
 
+# Test Quit functions 
 # test exit app function
 class TestExitApp:
     # valid input
@@ -28,7 +32,7 @@ class TestExitApp:
 class TestExitMain:
     # valid input - back to main menu
     def test_to_main(self):
-        with pytest.raises(main.BackToMain):
+        with pytest.raises(BackToMain):
             main.exit_main_check('m')
     
     # invalid input
@@ -45,7 +49,7 @@ class TestExitMain:
 class TestToUpper:
     # valid input
     def test_to_upper(self):
-        with pytest.raises(main.BackToChooseEditMethod):
+        with pytest.raises(BackToChooseEditMethod):
             main.back_to_upper_menu_check('q')
     
     # invalid input
@@ -56,7 +60,7 @@ class TestToUpper:
 class TestToEdit:
     # valid input
     def test_to_edit(self):
-        with pytest.raises(main.BackToChooseList):
+        with pytest.raises(BackToChooseList):
             main.back_to_edit_menu_check('l')
     
     # invalid input
@@ -67,13 +71,14 @@ class TestToEdit:
 class TestChooseAnotherElement:
     # valid input
     def test_choose_another_one(self):
-        with pytest.raises(main.BackToChooseElement):
+        with pytest.raises(BackToChooseElement):
             main.select_another_element('e')
     
     # invalid input
     def test_not_to_choose(self):
         assert main.select_another_element('m') is None
 
+# Test the essential functions relating to the create a new to-do list feature
 # test the function which is used to check if user's input has been used as a list name already
 class TestListNameDuplicate:
     # valid input - case insensitive
@@ -115,7 +120,7 @@ class TestObtainListName:
 
     # quit the function - back to main menu
     def test_quit(self, monkeypatch):
-        with pytest.raises(main.BackToMain):
+        with pytest.raises(BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
             main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1)
 
@@ -143,6 +148,11 @@ class TestObtainItemName:
         assert main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1) is False
         assert main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1) is False
 
+    # invalid input - empty input
+    def test_empty_input(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['']
+        assert main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1) is False
+
     # quite the function - exit the app
     def test_exit(self, monkeypatch):
         with pytest.raises(KeyboardInterrupt):
@@ -151,7 +161,7 @@ class TestObtainItemName:
 
     # quite the function - back to main menu
     def test_quit(self, monkeypatch):
-        with pytest.raises(main.BackToMain):
+        with pytest.raises(BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
             main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1)
 
@@ -190,11 +200,61 @@ class TestObtainDueDate:
 
     # quite the function - back to main menu
     def test_quit(self, monkeypatch):
-        with pytest.raises(main.BackToMain):
+        with pytest.raises(BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
             main.obtain_due_date(running_time_for_test = 1)
 
+# Test some essential functions relating to the edit an existing list feature
+# test if the list which the following code works on is empty or not
+class TestEmptyList:
+    # empty list
+    def test_empty_list(self):
+        with pytest.raises(EmptyList):
+            main.empty_list_check('first', {'first':[], 'second':['test']})
 
+    # not an empty list
+    def test_unempty_list(self):
+        assert main.empty_list_check('first', {'first':['test'], 'second':['test']}) is None
+
+# test if the list collection is empty or not
+class TestEmptyListCollection:
+    # empty list collection
+    def test_empty_list_collection(self):
+        with pytest.raises(EmptyListCollection):
+            main.empty_list_collection_check({})
+
+    # not an empty list collection
+    def test_unempty_list_collection(self):
+        assert main.empty_list_collection_check({'first':['test', '1'], 'second':['test', '2']}) is None
+
+# test the function to update the list collection
+class TestUpdateCollection:
+    def test_can_update(self):
+        list_name = 'first'
+        list_content = [{'name': 'walk dog', 'priority': '2', 'due date': '2/2/22'}]
+        list_collection = {'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
+        result = {'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}], 'first': [{'name': 'walk dog', 'priority': '2', 'due date': '2/2/22'}]}
+        assert main.update_collection(list_name, list_content, list_collection) == result
+
+# test the function to update the item name
+class TestUpdateItemName:
+    # valid input
+    def test_valid_name(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['1', 'do laundry']
+        all_item_names = ['shopping', 'walk dog']
+        assert main.update_item_name(all_item_names, running_time_for_test = 1) == '1'
+        assert main.update_item_name(all_item_names, running_time_for_test = 1) == 'do laundry'
+
+    # invalid input - duplicates (case insensitive)
+    def test_invalid_name(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['shopping', 'Shopping']
+        assert main.update_item_name(['shopping'], running_time_for_test = 1) is False
+        assert main.update_item_name(['shopping'], running_time_for_test = 1) is False
+
+    # invalid input - empty input
+    def test_empty_input(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['']
+        assert main.update_item_name(['shopping'], running_time_for_test = 1) is False
 
 
 

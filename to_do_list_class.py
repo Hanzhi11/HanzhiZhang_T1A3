@@ -30,7 +30,7 @@ class BackToChooseItem(Exception):
 class EmptyListCollection(Exception):
     def __init__(self):
         super().__init__('The list collection is empty. Please create one first.')
-        
-class ListNotExist(Exception):
-    def __init__(self, list_name):
-        super().__init__(f'The list \'{list_name}\' does not exist! Try another one!')
+class EmptyList(Exception):
+    def __init__(self):
+        super().__init__('The list \'{list_name}\' is empty. Please create one first.')
+
