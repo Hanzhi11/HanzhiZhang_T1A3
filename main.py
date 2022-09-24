@@ -44,18 +44,22 @@ def item_duplicate_check(input, item_names):
     else:
         return True
 
-def obtain_item_name(item_names):
+def obtain_item_name(running_time_for_test = -1):
     item_exists = False
     while not item_exists:
-        item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
-        if len(item_name) != 0:
-            exit_main_check(item_name)
-            item_exists = item_duplicate_check(item_name.lower(), item_names)
+        if running_time_for_test == 0:
+            return False
         else:
-            rprint('[red]Empty Input![/red]')
+            item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
+            if len(item_name) != 0:
+                exit_main_check(item_name)
+                item_exists = item_duplicate_check(item_name.lower(), item_names(items))
+            else:
+                rprint('[red]Empty Input![/red]')
+        running_time_for_test -= 1
     return item_name.lower()
 
-def obtain_new_item_name(item_names):
+def obtain_new_item_name():
     item_exists = False
     while not item_exists:
         item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method, e to choose another element)')
@@ -64,7 +68,7 @@ def obtain_new_item_name(item_names):
             back_to_upper_menu_check(item_name)
             back_to_edit_menu_check(item_name)
             select_another_element(item_name)
-            item_exists = item_duplicate_check(item_name, item_names)
+            item_exists = item_duplicate_check(item_name, item_names(items))
         else:
             rprint('[red]Empty Input![/red]')
     return item_name.lower()
@@ -107,8 +111,8 @@ def obtain_new_due_date():
         due_date = date_convert_format(due_date)
     return due_date
 
-def add_item(item_names, list_name):
-    item_name = obtain_item_name(item_names)
+def add_item(list_name):
+    item_name = obtain_item_name()
     priority_level = obtain_priority_level()
     converted_due_date = obtain_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
@@ -280,11 +284,11 @@ if __name__ == '__main__':
                 if selected_main_menu == '[1] Create a new list':
                     items = []
                     list_name = obtain_list_name(list_collection)
-                    add_item(item_names(items), list_name)
+                    add_item(list_name)
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                         yes_no_decision()
-                        add_item(item_names(items), list_name)
+                        add_item(list_name)
                 else:
                     empty_list_collection_check()
                     # edit an existing list
@@ -303,11 +307,11 @@ if __name__ == '__main__':
                                         while True:
                                             # add a new item to the list
                                             if selected_edit_method == '[1] Add a new item':
-                                                add_item(item_names(items), selected_list_name)
+                                                add_item(selected_list_name)
                                                 while True:
                                                     rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                                                     continue_but_change_selection(selected_list_name)
-                                                    add_item(item_names(items), selected_list_name)
+                                                    add_item(selected_list_name)
                                             else:
                                                 if len(list_collection[selected_list_name]) == 0:
                                                     rprint(f'[red]The \'{selected_list_name}\' list is empty! Add a new item first![/red]')
@@ -328,7 +332,7 @@ if __name__ == '__main__':
                                                                         # change item's name
                                                                         case '[1] Name':
                                                                             rprint(f"[#fee440]The current name is {selected_item.name}.[/#fee440]")
-                                                                            new_name = obtain_new_item_name(item_names(items))
+                                                                            new_name = obtain_new_item_name()
                                                                             selected_item.name = new_name
                                                                             rprint(f"[#00bbf9]The item name has been successfully amended to {selected_item.name}.[/#00bbf9]")
                                                                         # change item's priority level
