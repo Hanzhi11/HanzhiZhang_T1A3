@@ -31,47 +31,47 @@ def select_another_element(input):
     if input == 'e':
         raise BackToChooseElement
 
-def sort_items_and_update_list_collection(list_name, items):
-    sorted_item_list = sorted(items, key = lambda item: (item.due_date, item.priority), reverse = True)
+def sort_items_and_update_list_collection(list_name, list_content):
+    sorted_item_list = sorted(list_content, key = lambda item: (item.due_date, item.priority), reverse = True)
     new_list = {list_name: sorted_item_list}
     list_collection.update(new_list)
     return sorted_item_list
 
-def item_duplicate_check(input, item_names):
-    if input in item_names:
-        rprint(f'[red]The \'{input}\' item exists already. Use another name![/red]')
+def item_duplicate_check(user_input, all_item_names):
+    if user_input in all_item_names:
+        rprint(f'[red]The \'{user_input}\' item exists already. Use another name![/red]')
         return False
     else:
-        return True
+        return user_input
 
-def obtain_item_name(running_time_for_test = -1):
-    item_exists = False
-    while not item_exists:
+def obtain_item_name(all_item_names, running_time_for_test = -1):
+    valid_name = False
+    while not valid_name:
         if running_time_for_test == 0:
             return False
         else:
-            item_name = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
-            if len(item_name) != 0:
-                exit_main_check(item_name)
-                item_exists = item_duplicate_check(item_name.lower(), item_names(items))
+            user_input = Prompt.ask('Enter the item\'s name (x to exit the app or m to back to Main Menu)')
+            if len(user_input) != 0:
+                exit_main_check(user_input)
+                valid_name = item_duplicate_check(user_input.lower(), all_item_names)
             else:
                 rprint('[red]Empty Input![/red]')
         running_time_for_test -= 1
-    return item_name.lower()
+    return valid_name
 
-def obtain_new_item_name():
-    item_exists = False
-    while not item_exists:
-        item_name = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method, e to choose another element)')
-        if len(item_name) != 0:
-            exit_main_check(item_name)
-            back_to_upper_menu_check(item_name)
-            back_to_edit_menu_check(item_name)
-            select_another_element(item_name)
-            item_exists = item_duplicate_check(item_name, item_names(items))
+def obtain_new_item_name(all_item_names):
+    valid_new_name = False
+    while not valid_new_name:
+        user_input = Prompt.ask('Enter the item\'s name (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method, e to choose another element)')
+        if len(user_input) != 0:
+            exit_main_check(user_input)
+            back_to_upper_menu_check(user_input)
+            back_to_edit_menu_check(user_input)
+            select_another_element(user_input)
+            valid_new_name = item_duplicate_check(user_input.lower(), all_item_names)
         else:
             rprint('[red]Empty Input![/red]')
-    return item_name.lower()
+    return valid_new_name
 
 def obtain_priority_level():
     priority_level = Prompt.ask('Enter priority level', choices = ['1', '2', '3', 'x', 'm'])
@@ -86,38 +86,42 @@ def obtain_new_priority_level():
     select_another_element(priority_level)
     return priority_level
 
-def date_convert_format(due_date):
+def date_convert_format(user_input):
     try:
-        return datetime.strptime(due_date, '%d/%m/%y').date()
+        return datetime.strptime(user_input, '%d/%m/%y').date()
     except ValueError:
         rprint('[red]Invalid date![/red]')
 
-def obtain_due_date():
-    due_date = None
-    while not due_date:
-        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app or m to back to Main Menu)')
-        exit_main_check(due_date)
-        due_date = date_convert_format(due_date)
-    return due_date
+def obtain_due_date(running_time_for_test = -1):
+    valid_due_date = None
+    while not valid_due_date:
+        if running_time_for_test == 0:
+            return False
+        else:
+            user_input = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app or m to back to Main Menu)')
+            exit_main_check(user_input)
+            valid_due_date = date_convert_format(user_input)
+        running_time_for_test -= 1
+    return valid_due_date
 
 def obtain_new_due_date():
-    due_date = None
-    while not due_date:
-        due_date = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method, e to choose another element)')
-        exit_main_check(due_date)
-        back_to_upper_menu_check(due_date)
-        back_to_edit_menu_check(due_date)
-        select_another_element(due_date)
-        due_date = date_convert_format(due_date)
-    return due_date
+    valid_new_date = None
+    while not valid_new_date:
+        user_input = Prompt.ask('Enter Due date DD/MM/YY (x to exit the app, m to Main Menu, l to choose another list, q to choose another edit method, e to choose another element)')
+        exit_main_check(user_input)
+        back_to_upper_menu_check(user_input)
+        back_to_edit_menu_check(user_input)
+        select_another_element(user_input)
+        valid_new_date = date_convert_format(user_input)
+    return valid_new_date
 
-def add_item(list_name):
-    item_name = obtain_item_name()
+def add_item(list_name, list_content, all_item_names):
+    item_name = obtain_item_name(all_item_names)
     priority_level = obtain_priority_level()
     converted_due_date = obtain_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
-    items.append(new_item)
-    sort_items_and_update_list_collection(list_name, items)
+    list_content.append(new_item)
+    sort_items_and_update_list_collection(list_name, list_content)
     rprint(f"[#00bbf9]The new item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
 
 def empty_list_collection_check():
@@ -138,19 +142,20 @@ def yes_no_decision():
     menu_entry_index = terminal_menu.show()
     exit_main_quit(options, menu_entry_index)
 
-def list_selection(list_names):
+def list_selection():
     list_name_options = []
-    for index, name in enumerate(list_names, start = 1):
+    lists = list_names()
+    for index, name in enumerate(lists, start = 1):
         list_name_options.append(f'[{index}] {name}')
     options = [*list_name_options, '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     exit_main_quit(options, menu_entry_index)
-    return list_names[menu_entry_index]
+    return lists[menu_entry_index]
 
-def item_selection(item_names):
+def item_selection(all_item_names):
     item_name_options = []
-    for index, name in enumerate(item_names, start = 1):
+    for index, name in enumerate(all_item_names, start = 1):
         item_name_options.append(f'[{index}] {name}')
     options = [*item_name_options, '[q] Choose another edit method', '[l] Choose another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
@@ -205,20 +210,20 @@ def exit_main_list_method_quit(options, menu_entry_index):
 def remove_item(list_name):
     rprint(f'[italic #00f5d4]Select which item to be removed from the {list_name} list:[/italic #00f5d4]')
     item_name_list = [item.name for item in list_collection[list_name]]
-    selected_item_index = item_selection(item_name_list)
+    selected_item_index = item_selection(all_item_names = item_name_list)
     deleted_item_name = list_collection[list_name][selected_item_index].name
     del list_collection[list_name][selected_item_index]
     rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the list![#00bbf9]')
 
-def delete_list(list_names):
+def delete_list():
     rprint('[italic #00f5d4]Select which list you would like to delete:[/italic #00f5d4]')
-    selected_list_name = list_selection(list_names)
+    selected_list_name = list_selection()
     del list_collection[selected_list_name]
     rprint(f'[#00bbf9]List \'{selected_list_name}\' has been deleted![/#00bbf9]')
 
-def view_list(list_names):
+def view_list():
     rprint('[italic #00f5d4]Select which list you would like to view:[/italic #00f5d4]')
-    selected_list_name = list_selection(list_names)
+    selected_list_name = list_selection()
 
     display_list = Table(title = f'\n{selected_list_name.upper()}', title_style = '#f15bb5', min_width = 50, header_style = 'italic bold', box = box.HORIZONTALS, row_styles = [style.Style(bgcolor = '#aaaaaa'), ''])
 
@@ -248,29 +253,33 @@ def view_list(list_names):
     rprint(f'[#fee440]You are viewing the \'{selected_list_name}\' list![/#fee440]')
     console.print(display_list)
 
-def list_name_duplicate_check(input, list_names):
-    if input.lower() in list_names:
+def list_name_duplicate_check(input, all_list_names):
+    if input.lower() in all_list_names:
         rprint(f'[red]The list exists already. Enter another name.[/red]')
         return False
     else:
-        return True
+        return input.lower()
 
-def item_names(items):
-    return [item.name for item in items]
+def item_names(list_content):
+    return [item.name for item in list_content]
 
-def list_names(list_collection):
+def list_names():
     return list(list_collection.keys())
 
-def obtain_list_name():
-    list_name_exists = False
-    while not list_name_exists:
-        list_name = Prompt.ask('Enter the name of the new list (x to exit the app or m to back to Main Menu)')
-        if len(list_name) == 0:
-            rprint('[red]Empty input![/red]')
+def obtain_list_name(all_list_names, running_time_for_test = -1):
+    valid_list_name = None
+    while not valid_list_name:
+        if running_time_for_test == 0:
+            return False
         else:
-            exit_main_check(list_name)
-            list_name_exists = list_name_duplicate_check(list_name.lower(), list_names(list_collection))
-    return list_name.lower()
+            user_input = Prompt.ask('Enter the name of the new list (x to exit the app or m to back to Main Menu)')
+            if len(user_input) == 0:
+                rprint('[red]Empty input![/red]')
+            else:
+                exit_main_check(user_input)
+                valid_list_name = list_name_duplicate_check(user_input, all_list_names)
+        running_time_for_test -= 1
+    return valid_list_name
 
 if __name__ == '__main__':
     try:
@@ -282,13 +291,14 @@ if __name__ == '__main__':
             try:
                 # create a new list
                 if selected_main_menu == '[1] Create a new list':
-                    items = []
-                    list_name = obtain_list_name()
-                    add_item(list_name)
+                    all_items = []
+                    new_list_name = obtain_list_name(all_list_names = list_names())
+                    add_item(list_name = new_list_name, list_content = all_items, all_item_names = item_names(all_items))
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                         yes_no_decision()
-                        add_item(list_name)
+                        print(item_names(all_items))
+                        add_item(list_name = new_list_name, list_content = all_items, all_item_names = item_names(all_items))
                 else:
                     empty_list_collection_check()
                     # edit an existing list
@@ -296,8 +306,8 @@ if __name__ == '__main__':
                         while True:
                             # select a list for edit from the list collection
                             rprint('[italic #00f5d4]Select which list you would like to edit:[/italic #00f5d4]')
-                            selected_list_name = list_selection(list_names(list_collection))
-                            items = list_collection[selected_list_name]
+                            selected_list_name = list_selection()
+                            all_items = list_collection[selected_list_name]
                             try:
                                 while True:
                                     # select an edit method for the list selected above
@@ -307,11 +317,11 @@ if __name__ == '__main__':
                                         while True:
                                             # add a new item to the list
                                             if selected_edit_method == '[1] Add a new item':
-                                                add_item(selected_list_name)
+                                                add_item(list_name = selected_list_name, list_content = all_items, all_item_names = item_names(all_items))
                                                 while True:
                                                     rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                                                     continue_but_change_selection(selected_list_name)
-                                                    add_item(selected_list_name)
+                                                    add_item(list_name = selected_list_name, list_content = all_items, all_item_names = item_names(all_items))
                                             else:
                                                 if len(list_collection[selected_list_name]) == 0:
                                                     rprint(f'[red]The \'{selected_list_name}\' list is empty! Add a new item first![/red]')
@@ -320,7 +330,7 @@ if __name__ == '__main__':
                                                     while True:
                                                         # selecte an item for mofication
                                                         rprint('[italic #00f5d4]Select an item to modify:[/italic #00f5d4]')
-                                                        selected_item = list_collection[selected_list_name][item_selection(item_names(items))]
+                                                        selected_item = list_collection[selected_list_name][item_selection(all_item_names = item_names(all_items))]
                                                         try:
                                                             while True:
                                                                 # select an element for modification from the selected item above
@@ -332,7 +342,7 @@ if __name__ == '__main__':
                                                                         # change item's name
                                                                         case '[1] Name':
                                                                             rprint(f"[#fee440]The current name is {selected_item.name}.[/#fee440]")
-                                                                            new_name = obtain_new_item_name()
+                                                                            new_name = obtain_new_item_name(all_item_names = [item.name for item in all_items])
                                                                             selected_item.name = new_name
                                                                             rprint(f"[#00bbf9]The item name has been successfully amended to {selected_item.name}.[/#00bbf9]")
                                                                         # change item's priority level
@@ -349,7 +359,7 @@ if __name__ == '__main__':
                                                                             new_due_date = obtain_new_due_date()
                                                                             selected_item.due_date = new_due_date
                                                                             rprint(f"[#00bbf9]The due date has been successfully amended to {selected_item.due_date}.[/#00bbf9]")
-                                                                            sort_items_and_update_list_collection(selected_list_name, list_collection[selected_list_name])
+                                                                            sort_items_and_update_list_collection(list_name = selected_list_name, list_content = list_collection[selected_list_name])
                                                                     # check if the user would like to continue modifying the same item or to choose another one for modification
                                                                     continue_selection(selected_list_name, selected_item.name)
                                                                 # go back to choose another element of the item to modify
@@ -360,11 +370,11 @@ if __name__ == '__main__':
                                                             rprint (f'[#fee440]{err}[/#fee440]')
                                                 # remove an existing item from the list
                                                 elif selected_edit_method == '[3] Remove an existing item':
-                                                    remove_item(selected_list_name)
+                                                    remove_item(list_name = selected_list_name)
                                                     while len(list_collection[selected_list_name]) != 0:
                                                         rprint('[italic #00f5d4]Would you like to remove another item?[/italic #00f5d4]')
                                                         yes_no_decision()
-                                                        remove_item(selected_list_name)
+                                                        remove_item(list_name = selected_list_name)
                                                     rprint(f'[#fee440]The {selected_list_name} list is now empty![/#fee440]')
                                                     break
                                     # go back to choose another edit method for the list
@@ -375,15 +385,15 @@ if __name__ == '__main__':
                                         rprint (f'[#fee440]{err}[/#fee440]')
                     # delete an existing list
                     elif selected_main_menu == '[3] Delete an existing list':
-                        delete_list(list_names(list_collection))
+                        delete_list()
                         while len(list_collection) != 0:
                             rprint('[italic #00f5d4]Would you like to delete another list?[/italic #00f5d4]')
                             yes_no_decision()
-                            delete_list(list_names(list_collection))
+                            delete_list()
                         rprint('[red]The list collection is now empty![/red]')
                     # view an existing list
                     elif selected_main_menu == '[4] View an existing list':
-                        view_list(list_names(list_collection))
+                        view_list()
             # back to main menu
             except BackToMain as err:
                 rprint (f'[#fee440]{err}[/#fee440]')

@@ -8,7 +8,7 @@ import main
 
 # from main import BackToChooseEditMethod, BackToMain, BackToChooseList, exit_app, exit_main_check, back_to_upper_menu_check, back_to_edit_menu_check, list_name_duplicate_check, item_duplicate_check, date_convert_format, obtain_list_name, obtain_due_date
 
-inputs = iter(['2', 'M', 'X', 'secondlist', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', 'x', 'm', '2/2/22', '03/03/33', 'x', 'm'])
+inputs = iter(['2', 'M', 'X', 'secondlist', 'Firstlist', '1', 'firstList', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', 'x', 'm', '2/2/22', '03/03/33', '2', '2/', 's', 'x', 'm'])
 
 def fake_input(prompt):
     return next(inputs)
@@ -90,27 +90,34 @@ class TestListNameDuplicate:
     def test_case_insensitive(self):
         assert main.list_name_duplicate_check('AB', ['b', 'ab']) is False
 
-# test the function which is used to obtain return a valid list name
+# test the function which is used to obtain and return a valid list name
 class TestObtainListName:
-    # functional test using a valid input
+    # valid input
     def test_valid_name(self, monkeypatch):
         monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['2', 'M', 'X', 'secondlist']
-        assert main.obtain_list_name({'firstlist': [], '1': []}) == '2'
-        assert main.obtain_list_name({'firstlist': [], '1': []}) == 'm'
-        assert main.obtain_list_name({'firstlist': [], '1': []}) == 'x'
-        assert main.obtain_list_name({'firstlist': [], '1': []}) == 'secondlist'
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) == '2'
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) == 'm'
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) == 'x'
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) == 'secondlist'
+
+    # invalid input - duplicates(case insensitive)
+    def test_invalid_name(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['Firstlist', '1', 'firstList']
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) is False
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) is False
+        assert main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1) is False
 
     # quit the function - exit the app
     def test_exit(self, monkeypatch):
         with pytest.raises(KeyboardInterrupt):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['x']
-            main.obtain_list_name({'firstlist': [], '1': []})
+            main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1)
 
     # quit the function - back to main menu
     def test_quit(self, monkeypatch):
         with pytest.raises(main.BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
-            main.obtain_list_name({'firstlist': [], '1': []})
+            main.obtain_list_name(all_list_names = ['firstlist', '1'], running_time_for_test = 1)
 
 # test the function which is used to check if user's input has been used as an item name already
 class TestItemDuplicate:
@@ -124,28 +131,29 @@ class TestItemDuplicate:
 
 # test the function which is used to obtain and return a valid item name
 class TestObtainItemName:
-    # functional test using a valid input
+    # valid input
     def test_valid_name(self, monkeypatch):
         monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['walk dog', 'shopping']
-        assert main.obtain_item_name(['do laundry'], test = 1) == 'walk dog'
-        assert main.obtain_item_name(['do laundry'], test = 1) == 'shopping'
+        assert main.obtain_item_name(all_item_names = ['do laundry'], running_time_for_test = 1) == 'walk dog'
+        assert main.obtain_item_name(all_item_names = ['do laundry'], running_time_for_test = 1) == 'shopping'
 
+    # invalid input - duplicates (case insensitive)
     def test_invalid_name(self, monkeypatch):
         monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['shopping', 'Shopping']
-        assert main.obtain_item_name(['shopping'], test = 1) is False
-        assert main.obtain_item_name(['shopping'], test = 1) is False
+        assert main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1) is False
+        assert main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1) is False
 
     # quite the function - exit the app
     def test_exit(self, monkeypatch):
         with pytest.raises(KeyboardInterrupt):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['x']
-            main.obtain_item_name({'firstlist': [], '1': []})
+            main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1)
 
     # quite the function - back to main menu
     def test_quit(self, monkeypatch):
         with pytest.raises(main.BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
-            main.obtain_item_name({'firstlist': [], '1': []})
+            main.obtain_item_name(all_item_names = ['shopping'], running_time_for_test = 1)
 
 # test the function which is used to check if user's input is in a valid format
 class TestDateFormat:
@@ -156,29 +164,35 @@ class TestDateFormat:
 
     # invalid input
     def test_invalid(self):
-        with pytest.raises(ValueError):
-            main.date_convert_format('2/2')
-            main.date_convert_format('0.2/2')
+        assert main.date_convert_format('2/2') is None
+        assert main.date_convert_format('0.2/2') is None
 
 # test the function which is used to obtain and return a valid due date
 class TestObtainDueDate:
-    # functional test using a valid input
+    # valid input
     def test_valid_date(self, monkeypatch):
         monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['2/2/22', '03/03/33']
-        assert main.obtain_due_date() 
-        assert main.obtain_due_date()
+        assert main.obtain_due_date(running_time_for_test = 1) 
+        assert main.obtain_due_date(running_time_for_test = 1)
+
+    # invalid input
+    def test_invalid_date(self, monkeypatch):
+        monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['2', '2/', 's']
+        assert main.obtain_due_date(running_time_for_test = 1) is False
+        assert main.obtain_due_date(running_time_for_test = 1) is False
+        assert main.obtain_due_date(running_time_for_test = 1) is False
 
     # quite the function - exit the app
     def test_exit(self, monkeypatch):
         with pytest.raises(KeyboardInterrupt):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['x']
-            main.obtain_due_date()
+            main.obtain_due_date(running_time_for_test = 1)
 
     # quite the function - back to main menu
     def test_quit(self, monkeypatch):
         with pytest.raises(main.BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
-            main.obtain_due_date()
+            main.obtain_due_date(running_time_for_test = 1)
 
 
 
