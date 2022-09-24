@@ -31,11 +31,12 @@ def select_another_element(input):
     if input == 'e':
         raise BackToChooseElement
 
-def sort_items_and_update_list_collection(list_name, list_content):
-    sorted_item_list = sorted(list_content, key = lambda item: (item.due_date, item.priority), reverse = True)
-    new_list = {list_name: sorted_item_list}
+def sort_items(list_content):
+    return sorted(list_content, key = lambda item: (item.due_date, item.priority), reverse = True)
+
+def update_collection(list_name, list_content, list_collection):
+    new_list = {list_name: list_content}
     list_collection.update(new_list)
-    return sorted_item_list
 
 def item_duplicate_check(user_input, all_item_names):
     if user_input in all_item_names:
@@ -121,7 +122,6 @@ def add_item(list_name, list_content, all_item_names):
     converted_due_date = obtain_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
     list_content.append(new_item)
-    sort_items_and_update_list_collection(list_name, list_content)
     rprint(f"[#00bbf9]The new item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
 
 def empty_list_collection_check():
@@ -210,7 +210,7 @@ def exit_main_list_method_quit(options, menu_entry_index):
 def remove_item(list_name):
     rprint(f'[italic #00f5d4]Select which item to be removed from the {list_name} list:[/italic #00f5d4]')
     item_name_list = [item.name for item in list_collection[list_name]]
-    selected_item_index = item_selection(all_item_names = item_name_list)
+    selected_item_index = item_selection(item_name_list)
     deleted_item_name = list_collection[list_name][selected_item_index].name
     del list_collection[list_name][selected_item_index]
     rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the list![#00bbf9]')
@@ -236,7 +236,9 @@ def view_list():
     medium_bar = Bar(size = 1, begin = 0.33, end = 0.67, width = 21, color = 'yellow', bgcolor = None)
     short_bar = Bar(size = 1, begin = 0, end = 0.33, width = 21, color = 'green', bgcolor = None)
 
-    for index, item in enumerate(list_collection[selected_list_name], start = 1):
+    sorted_list_content = sort_items(list_content = list_collection[selected_list_name])
+
+    for index, item in enumerate(sorted_list_content, start = 1):
         str_due_date = Text(datetime.strftime(item.due_date, '%d/%m/%y'))
         priority_level = item.priority
         if item.due_date < date.today():
@@ -293,12 +295,14 @@ if __name__ == '__main__':
                 if selected_main_menu == '[1] Create a new list':
                     all_items = []
                     new_list_name = obtain_list_name(all_list_names = list_names())
-                    add_item(list_name = new_list_name, list_content = all_items, all_item_names = item_names(all_items))
+                    add_item(new_list_name, all_items, item_names(all_items))
+                    update_collection(new_list_name, all_items, list_collection)
                     while True:
                         rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                         yes_no_decision()
                         print(item_names(all_items))
                         add_item(list_name = new_list_name, list_content = all_items, all_item_names = item_names(all_items))
+                        update_collection(new_list_name, all_items, list_collection)
                 else:
                     empty_list_collection_check()
                     # edit an existing list
@@ -317,11 +321,13 @@ if __name__ == '__main__':
                                         while True:
                                             # add a new item to the list
                                             if selected_edit_method == '[1] Add a new item':
-                                                add_item(list_name = selected_list_name, list_content = all_items, all_item_names = item_names(all_items))
+                                                add_item(selected_list_name, all_items, item_names(all_items))
+                                                update_collection(selected_list_name, all_items, list_collection)
                                                 while True:
                                                     rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
                                                     continue_but_change_selection(selected_list_name)
-                                                    add_item(list_name = selected_list_name, list_content = all_items, all_item_names = item_names(all_items))
+                                                    add_item(selected_list_name, all_items, item_names(all_items))
+                                                    update_collection(selected_list_name, all_items, list_collection)
                                             else:
                                                 if len(list_collection[selected_list_name]) == 0:
                                                     rprint(f'[red]The \'{selected_list_name}\' list is empty! Add a new item first![/red]')
@@ -342,7 +348,7 @@ if __name__ == '__main__':
                                                                         # change item's name
                                                                         case '[1] Name':
                                                                             rprint(f"[#fee440]The current name is {selected_item.name}.[/#fee440]")
-                                                                            new_name = obtain_new_item_name(all_item_names = [item.name for item in all_items])
+                                                                            new_name = obtain_new_item_name([item.name for item in all_items])
                                                                             selected_item.name = new_name
                                                                             rprint(f"[#00bbf9]The item name has been successfully amended to {selected_item.name}.[/#00bbf9]")
                                                                         # change item's priority level
@@ -352,14 +358,14 @@ if __name__ == '__main__':
                                                                             new_priority = obtain_new_priority_level()
                                                                             selected_item.priority = new_priority
                                                                             rprint(f"[#00bbf9]The priority level has been successfully amended to {selected_item.priority}.[/#00bbf9]")
-                                                                            sort_items_and_update_list_collection(selected_list_name, list_collection[selected_list_name])
+                                                                            update_collection(selected_list_name, all_items, list_collection)
                                                                         # change item's due date
                                                                         case '[3] Due date':
                                                                             rprint(f"[#fee440]The current due date is {selected_item.due_date}.[/#fee440]")
                                                                             new_due_date = obtain_new_due_date()
                                                                             selected_item.due_date = new_due_date
                                                                             rprint(f"[#00bbf9]The due date has been successfully amended to {selected_item.due_date}.[/#00bbf9]")
-                                                                            sort_items_and_update_list_collection(list_name = selected_list_name, list_content = list_collection[selected_list_name])
+                                                                            update_collection(selected_list_name, all_items, list_collection)
                                                                     # check if the user would like to continue modifying the same item or to choose another one for modification
                                                                     continue_selection(selected_list_name, selected_item.name)
                                                                 # go back to choose another element of the item to modify

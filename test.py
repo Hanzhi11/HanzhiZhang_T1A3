@@ -6,8 +6,6 @@ from datetime import datetime
 
 import main
 
-# from main import BackToChooseEditMethod, BackToMain, BackToChooseList, exit_app, exit_main_check, back_to_upper_menu_check, back_to_edit_menu_check, list_name_duplicate_check, item_duplicate_check, date_convert_format, obtain_list_name, obtain_due_date
-
 inputs = iter(['2', 'M', 'X', 'secondlist', 'Firstlist', '1', 'firstList', 'x', 'm', 'walk dog', 'shopping', 'shopping', 'Shopping', 'x', 'm', '2/2/22', '03/03/33', '2', '2/', 's', 'x', 'm'])
 
 def fake_input(prompt):
@@ -195,6 +193,7 @@ class TestObtainDueDate:
         with pytest.raises(main.BackToMain):
             monkeypatch.setattr(Prompt, 'ask', fake_input) # test case ['m']
             main.obtain_due_date(running_time_for_test = 1)
+
 
 
 
