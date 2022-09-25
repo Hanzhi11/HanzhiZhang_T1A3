@@ -308,10 +308,10 @@ class TestRemoveItem:
     def test_remove(self, monkeypatch):
         monkeypatch.setattr(main, 'item_selection', fake_selection) # test case [0, 0, 1, 1]
         monkeypatch.setattr('main.item_names', fake_names) # test case ['shopping', 'dishwashing']
-        list_name = 'first'
-        list_collection = {'first': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
-        result0 = {'first': [{'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
-        result1 = {'first': [], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}]}
+        list_name = 'second'
+        list_collection = {'first': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}]}
+        result0 = {'first': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': [{'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}]}
+        result1 = {'first': [{'name': 'shopping', 'priority': '1', 'due date': '3/3/22'}, {'name': 'dishwashing', 'priority': '1', 'due date': '3/3/22'}], 'second': []}
         assert main.remove_item(list_name, list_collection) == result0
         assert main.remove_item(list_name, list_collection) == result1
 
