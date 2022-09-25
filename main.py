@@ -174,6 +174,7 @@ def empty_list_collection_check(list_collection):
 
 def empty_list_check(list_name, list_collection):
     if len(list_collection[list_name]) == 0:
+        rprint(f'[#fee440]The \'{list_name}\' list is now empty![/#fee440]')
         raise EmptyList
 
 def main_menu_selection():
@@ -189,6 +190,13 @@ def yes_no_decision():
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     exit_main_quit(options, menu_entry_index)
+
+def yes_no_selection():
+    options = ['[y] Yes', '[n] No']
+    terminal_menu = TerminalMenu(options)
+    menu_entry_index = terminal_menu.show()
+    if menu_entry_index == 0:
+        return True
 
 def list_selection():
     list_name_options = []
@@ -367,81 +375,73 @@ if __name__ == '__main__':
                                     rprint(f'[italic #00f5d4]How would you like to edit the \'{selected_list_name}\' list?[/italic #00f5d4]')
                                     selected_edit_method = how_to_edit_selection()
                                     try:
-                                        is_empty_list = False
-                                        while not is_empty_list:
-                                            # add a new item to the list
-                                            if selected_edit_method == '[1] Add a new item':
+                                        # add a new item to the list
+                                        if selected_edit_method == '[1] Add a new item':
+                                            add_new_item(selected_list_name, all_items, item_names(all_items))
+                                            update_collection(selected_list_name, all_items, list_collection)
+                                            while True:
+                                                rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
+                                                continue_but_change_selection(selected_list_name)
                                                 add_new_item(selected_list_name, all_items, item_names(all_items))
                                                 update_collection(selected_list_name, all_items, list_collection)
-                                                while True:
-                                                    rprint('[italic #00f5d4]Would you like to add another item?[/italic #00f5d4]')
-                                                    continue_but_change_selection(selected_list_name)
-                                                    add_new_item(selected_list_name, all_items, item_names(all_items))
-                                                    update_collection(selected_list_name, all_items, list_collection)
-                                            else:
-                                                if len(list_collection[selected_list_name]) == 0:
-                                                    rprint(f'[red]The \'{selected_list_name}\' list is empty! Add a new item first![/red]')
-                                                    is_empty_list = True
-                                                # modify an existing item in the list
-                                                elif selected_edit_method == '[2] Modify an existing item':
+                                        # modify an existing item in the list
+                                        elif selected_edit_method == '[2] Modify an existing item':
+                                            while True:
+                                                # selecte an item for mofication
+                                                rprint('[italic #00f5d4]Select an item to modify:[/italic #00f5d4]')
+                                                selected_item = list_collection[selected_list_name][item_selection(item_names(all_items))]
+                                                try:
                                                     while True:
-                                                        # selecte an item for mofication
-                                                        rprint('[italic #00f5d4]Select an item to modify:[/italic #00f5d4]')
-                                                        selected_item = list_collection[selected_list_name][item_selection(item_names(all_items))]
+                                                        # select an element for modification from the selected item above
+                                                        rprint(f"[italic #00f5d4]Which element of the '{selected_item.name}' item would you like to edit?[/italic #00f5d4]")
+                                                        rprint(f"[#fee440]Its current status: Name is {selected_item.name}, Priority level is {selected_item.priority}, Due date is {selected_item.due_date}.[/#fee440]")
+                                                        selected_element = element_selection()
                                                         try:
-                                                            while True:
-                                                                # select an element for modification from the selected item above
-                                                                rprint(f"[italic #00f5d4]Which element of the '{selected_item.name}' item would you like to edit?[/italic #00f5d4]")
-                                                                rprint(f"[#fee440]Its current status: Name is {selected_item.name}, Priority level is {selected_item.priority}, Due date is {selected_item.due_date}.[/#fee440]")
-                                                                selected_element = element_selection()
-                                                                try:
-                                                                    match selected_element:
-                                                                        # change item's name
-                                                                        case '[1] Name':
-                                                                            rprint(f"[#fee440]The current name is {selected_item.name}.[/#fee440]")
-                                                                            new_name = update_item_name(item_names(all_items))
-                                                                            selected_item.name = new_name
-                                                                            rprint(f"[#00bbf9]The item name has been successfully amended to {selected_item.name}.[/#00bbf9]")
-                                                                        # change item's priority level
-                                                                        case '[2] Priority':
-                                                                            rprint('[italic #00f5d4]Select a new priority level:[/italic #00f5d4]')
-                                                                            rprint(f"[#fee440]The current priority level is {selected_item.priority}.[/#fee440]")
-                                                                            new_priority = update_priority_level()
-                                                                            selected_item.priority = new_priority
-                                                                            rprint(f"[#00bbf9]The priority level has been successfully amended to {selected_item.priority}.[/#00bbf9]")
-                                                                            update_collection(selected_list_name, all_items, list_collection)
-                                                                        # change item's due date
-                                                                        case '[3] Due date':
-                                                                            rprint(f"[#fee440]The current due date is {selected_item.due_date}.[/#fee440]")
-                                                                            new_due_date = update_due_date()
-                                                                            selected_item.due_date = new_due_date
-                                                                            rprint(f"[#00bbf9]The due date has been successfully amended to {selected_item.due_date}.[/#00bbf9]")
-                                                                            update_collection(selected_list_name, all_items, list_collection)
-                                                                    # check if the user would like to continue modifying the same item or to choose another one for modification
-                                                                    continue_selection(selected_list_name, selected_item.name)
-                                                                # go back to choose another element of the item to modify
-                                                                except BackToChooseElement as err:
-                                                                    rprint (f'[#fee440]{err}[/#fee440]')
-                                                        # go back to choose another item to modify
-                                                        except BackToChooseItem as err:
+                                                            match selected_element:
+                                                                # change item's name
+                                                                case '[1] Name':
+                                                                    rprint(f"[#fee440]The current name is {selected_item.name}.[/#fee440]")
+                                                                    new_name = update_item_name(item_names(all_items))
+                                                                    selected_item.name = new_name
+                                                                    rprint(f"[#00bbf9]The item name has been successfully amended to {selected_item.name}.[/#00bbf9]")
+                                                                # change item's priority level
+                                                                case '[2] Priority':
+                                                                    rprint('[italic #00f5d4]Select a new priority level:[/italic #00f5d4]')
+                                                                    rprint(f"[#fee440]The current priority level is {selected_item.priority}.[/#fee440]")
+                                                                    new_priority = update_priority_level()
+                                                                    selected_item.priority = new_priority
+                                                                    rprint(f"[#00bbf9]The priority level has been successfully amended to {selected_item.priority}.[/#00bbf9]")
+                                                                    update_collection(selected_list_name, all_items, list_collection)
+                                                                # change item's due date
+                                                                case '[3] Due date':
+                                                                    rprint(f"[#fee440]The current due date is {selected_item.due_date}.[/#fee440]")
+                                                                    new_due_date = update_due_date()
+                                                                    selected_item.due_date = new_due_date
+                                                                    rprint(f"[#00bbf9]The due date has been successfully amended to {selected_item.due_date}.[/#00bbf9]")
+                                                                    update_collection(selected_list_name, all_items, list_collection)
+                                                            # check if the user would like to continue modifying the same item or to choose another one for modification
+                                                            continue_selection(selected_list_name, selected_item.name)
+                                                        # go back to choose another element of the item to modify
+                                                        except BackToChooseElement as err:
                                                             rprint (f'[#fee440]{err}[/#fee440]')
-                                                # remove an existing item from the list
-                                                elif selected_edit_method == '[3] Remove an existing item':
-                                                    remove_item(selected_list_name, list_collection)
-                                                    while len(list_collection[selected_list_name]) != 0:
-                                                        rprint('[italic #00f5d4]Would you like to remove another item?[/italic #00f5d4]')
-                                                        continue_but_change_selection(selected_list_name)
-                                                        remove_item(selected_list_name, list_collection)
-                                                    rprint(f'[#fee440]The {selected_list_name} list is now empty![/#fee440]')
-                                                    is_empty_list = True
+                                                # go back to choose another item to modify
+                                                except BackToChooseItem as err:
+                                                    rprint (f'[#fee440]{err}[/#fee440]')
+                                        # remove an existing item from the list
+                                        elif selected_edit_method == '[3] Remove an existing item':
+                                            remove_item(selected_list_name, list_collection)
+                                            while not empty_list_check(selected_list_name, list_collection):
+                                                rprint('[italic #00f5d4]Would you like to remove another item?[/italic #00f5d4]')
+                                                continue_but_change_selection(selected_list_name)
+                                                remove_item(selected_list_name, list_collection)
                                     # go back to choose another edit method for the list
                                     except BackToChooseEditMethod as err:
                                         rprint (f'[#fee440]{err}[/#fee440]')
                             # go back to choose another list to edit
                             except BackToChooseList as err:
                                 rprint (f'[#fee440]{err}[/#fee440]')
-                            except EmptyList as err:
-                                rprint (f'[#fee440]{err}[/#fee440]')
+                            except EmptyList:
+                                pass
                     # delete an existing list
                     elif selected_main_menu == '[3] Delete an existing list':
                         delete_list()
@@ -467,8 +467,8 @@ if __name__ == '__main__':
                                         for i in range(len(list_collection[list_name]))},
                                     orient = 'index',)
         if not data.empty:
-            save_or_not = Prompt.ask('Would you like to save and export your list collection?', choices = ['y', 'n'])
-            if save_or_not == 'y':
+            rprint('[italic #00f5d4]Would you like to save and export your list collection?[/italic #00f5d4]')
+            if yes_no_selection() == True:
                 file_name = None
                 while not file_name:
                     file_name = Prompt.ask('Please enter the name of your list collection')
