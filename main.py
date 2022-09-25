@@ -445,11 +445,10 @@ if __name__ == '__main__':
                     # delete an existing list
                     elif selected_main_menu == '[3] Delete an existing list':
                         delete_list()
-                        while len(list_collection) != 0:
+                        while not empty_list_collection_check(list_collection):
                             rprint('[italic #00f5d4]Would you like to delete another list?[/italic #00f5d4]')
                             yes_no_decision()
                             delete_list()
-                        rprint('[red]The list collection is now empty![/red]')
                     # view an existing list
                     elif selected_main_menu == '[4] View an existing list':
                         view_list()
