@@ -157,7 +157,7 @@ def add_item(list_name, list_content, all_item_names):
     converted_due_date = obtain_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
     list_content.append(new_item)
-    rprint(f"[#00bbf9]The item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
+    rprint(f"[#00bbf9]The item '{item_name}' has been successfully added to the '{list_name}' list.[/#00bbf9]")
     return list_content
 
 def add_new_item(list_name, list_content, all_item_names):
@@ -166,7 +166,7 @@ def add_new_item(list_name, list_content, all_item_names):
     converted_due_date = get_new_due_date()
     new_item = ListItem(item_name, priority_level, converted_due_date)
     list_content.append(new_item)
-    rprint(f"[#00bbf9]The item '{item_name}' has been successfully added to {list_name}.[/#00bbf9]")
+    rprint(f"[#00bbf9]The item '{item_name}' has been successfully added to the '{list_name}' list.[/#00bbf9]")
 
 def empty_list_collection_check(list_collection):
     if len(list_collection) == 0:
@@ -228,13 +228,13 @@ def element_selection():
     return options[menu_entry_index]
 
 def continue_selection(list_name, item_name):
-    options = [f'[1] Continue to edit the \'{item_name}\' item', f'[2] Continue to edit the current {list_name} list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
+    options = [f'[y] Continue to modify the \'{item_name}\' item', '[q] Choose another edit method', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     exit_main_list_method_quit(options, menu_entry_index)
 
 def continue_but_change_selection(list_name):
-    options = ['[y] Yes', f'[n] Continue to edit the \'{list_name}\' list', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
+    options = ['[y] Yes', '[q] Choose another edit method', '[l] Edit another list', '[m] Back to Main menu', '[x] Exit the app']
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     exit_main_list_method_quit(options, menu_entry_index)
@@ -256,12 +256,12 @@ def exit_main_list_method_quit(options, menu_entry_index):
     exit_main_list_quit(options, menu_entry_index)
 
 def remove_item(list_name, list_collection):
-    rprint(f'[italic #00f5d4]Select which item to be removed from the {list_name} list:[/italic #00f5d4]')
+    rprint(f'[italic #00f5d4]Select which item to be removed from the \'{list_name}\' list:[/italic #00f5d4]')
     item_name_list = item_names(list_collection[list_name])
     selected_item_index = item_selection(item_name_list)
     deleted_item_name = item_name_list[selected_item_index]
     del list_collection[list_name][selected_item_index]
-    rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the list![#00bbf9]')
+    rprint(f'[#00bbf9]Item \'{deleted_item_name}\' has been removed from the \'{list_name}\' list![#00bbf9]')
     return list_collection
 
 def delete_list():
@@ -430,7 +430,7 @@ if __name__ == '__main__':
                                                     remove_item(selected_list_name, list_collection)
                                                     while len(list_collection[selected_list_name]) != 0:
                                                         rprint('[italic #00f5d4]Would you like to remove another item?[/italic #00f5d4]')
-                                                        yes_no_decision()
+                                                        continue_but_change_selection(selected_list_name)
                                                         remove_item(selected_list_name, list_collection)
                                                     rprint(f'[#fee440]The {selected_list_name} list is now empty![/#fee440]')
                                                     is_empty_list = True
