@@ -196,6 +196,7 @@ Please refer to test.py for the pytest code and test_result.txt for the test rep
     1. Select 'Delete an existing list' on the main menu using up or down arrow key + enter or by entering the shortcut of '3'.
     2. Enter the number at the front of the list, or use up or down arrow key + enter to delete the list.
     3. Use up or down arrow keys + enter or enter the shortcut key at the front the option to select if you would like to delete another list.
+
     ![Delete a list](docs/how_to_use/delete-list.png)
 
   - View an existing list
@@ -205,8 +206,10 @@ Please refer to test.py for the pytest code and test_result.txt for the test rep
      - The items are sorted by their due date in descending order. When two items have the same due date, these two items will be sorted by their priority level in descending order.
      - High priority level is indicated by a red bar, medium level by a yellow bar and low level by a green bar.
      - The due date is displayed in a red color if the due date is earlier than today, otherwise in a green color.
+  
     ![View a list](docs/how_to_use/view-list.png)
 
   Notes:
     Once you select to exit the app, if there is at least one non-empty list in the list collection, you will be asked to select if you would like to save and export all non-empty lists in the list collection. If you select yes, you will be asked to enter a file name. Then, all the non-empty lists that you have created will be exported to an excel file using your input as the file name in your working directory. Otherwise, you exit the app straight away.
+
     ![export](docs/how_to_use/list-export.png)
