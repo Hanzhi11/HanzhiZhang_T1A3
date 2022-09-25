@@ -463,8 +463,14 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         # save user's inputs in an excel file and export the file
         data = pandas.DataFrame.from_dict({(list_name, i): list_collection[list_name][i].__dict__
-                                                for list_name in list_collection.keys()
-                                                for i in range(len(list_collection[list_name]))},
-                                            orient = 'index',)
-        data.to_excel('data.xlsx')
+                                        for list_name in list_collection.keys()
+                                        for i in range(len(list_collection[list_name]))},
+                                    orient = 'index',)
+        if not data.empty:
+            save_or_not = Prompt.ask('Would you like to save and export your list collection?', choices = ['y', 'n'])
+            if save_or_not == 'y':
+                file_name = None
+                while not file_name:
+                    file_name = Prompt.ask('Please enter the name of your list collection')
+                data.to_excel(f'{file_name}.xlsx')
         rprint('[#9b5de5]You have existed the app![/#9b5de5]')
