@@ -32,5 +32,5 @@ class EmptyListCollection(Exception):
         super().__init__('The list collection is empty.')
 class EmptyList(Exception):
     def __init__(self):
-        super().__init__('The list is empty.')
+        super().__init__('empty!')
 

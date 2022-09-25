@@ -174,7 +174,6 @@ def empty_list_collection_check(list_collection):
 
 def empty_list_check(list_name, list_collection):
     if len(list_collection[list_name]) == 0:
-        rprint(f'[#fee440]The \'{list_name}\' list is now empty![/#fee440]')
         raise EmptyList
 
 def main_menu_selection():
@@ -368,7 +367,6 @@ if __name__ == '__main__':
                             rprint('[italic #00f5d4]Select which list you would like to edit:[/italic #00f5d4]')
                             selected_list_name = list_selection()
                             try:
-                                empty_list_check(selected_list_name, list_collection)
                                 all_items = list_collection[selected_list_name]
                                 while True:
                                     # select an edit method for the list selected above
@@ -386,8 +384,9 @@ if __name__ == '__main__':
                                                 update_collection(selected_list_name, all_items, list_collection)
                                         # modify an existing item in the list
                                         elif selected_edit_method == '[2] Modify an existing item':
+                                            empty_list_check(selected_list_name, list_collection)
                                             while True:
-                                                # selecte an item for mofication
+                                                # selecte an item for modification
                                                 rprint('[italic #00f5d4]Select an item to modify:[/italic #00f5d4]')
                                                 selected_item = list_collection[selected_list_name][item_selection(item_names(all_items))]
                                                 try:
@@ -429,6 +428,7 @@ if __name__ == '__main__':
                                                     rprint (f'[#fee440]{err}[/#fee440]')
                                         # remove an existing item from the list
                                         elif selected_edit_method == '[3] Remove an existing item':
+                                            empty_list_check(selected_list_name, list_collection)
                                             remove_item(selected_list_name, list_collection)
                                             while not empty_list_check(selected_list_name, list_collection):
                                                 rprint('[italic #00f5d4]Would you like to remove another item?[/italic #00f5d4]')
@@ -440,8 +440,8 @@ if __name__ == '__main__':
                             # go back to choose another list to edit
                             except BackToChooseList as err:
                                 rprint (f'[#fee440]{err}[/#fee440]')
-                            except EmptyList:
-                                pass
+                            except EmptyList as err:
+                                rprint (f'[#fee440]The \'{selected_list_name}\' list is now {err}[/#fee440]')
                     # delete an existing list
                     elif selected_main_menu == '[3] Delete an existing list':
                         delete_list()
